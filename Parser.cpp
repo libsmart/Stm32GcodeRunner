@@ -8,13 +8,17 @@
 
 extern Debugger *DBG;
 
+#define LOG_LETTER_PARAM(letter) \
+     if(pVal_##letter != nullptr) \
+     Debugger_log(DBG, #letter": f=%f  l=%ld", strtod(pVal_##letter, nullptr), strtol(pVal_##letter, nullptr, 10))
+
 inline void char_to_uppercase(char &c) {
     if (c >= 'a' && c <= 'z') {
         c = c - ('a' - 'A');
     }
 }
 
-void Stm32GcodeRunner::Parser::parseString(const char *inputString, uint32_t strlen) {
+Stm32GcodeRunner::Parser::parserReturn Stm32GcodeRunner::Parser::parseString(CommandContext *cmdCtx, const char *inputString, uint32_t strlen) {
 
     Debugger_log(DBG, "Stm32GcodeRunner::Parser::parseString('%.*s')", strlen, inputString);
 
@@ -118,30 +122,89 @@ void Stm32GcodeRunner::Parser::parseString(const char *inputString, uint32_t str
     }
 
     // Call the commands
-    if (command_letter == '?') return; // no valid command found
-    if (command_number < 0) return; // no valid command found
+    if (command_letter == '?') return parserReturn::UNKNOWN_COMMAND; // no valid command found
+    if (command_number < 0) return parserReturn::UNKNOWN_COMMAND; // no valid command found
 
 
-    Debugger_log(DBG, "Found command: %c%d", command_letter, command_number);
+    Debugger_log(DBG, "Parsed command: %c%d", command_letter, command_number);
 
-#define LOG_LETTER_PARAM(letter) \
-     if(pVal_##letter != nullptr) \
-     Debugger_log(DBG, #letter": f=%f  l=%ld", strtod(pVal_##letter, nullptr), strtol(pVal_##letter, nullptr, 10))
+    LOG_LETTER_PARAM(S);
+    LOG_LETTER_PARAM(F);
+    LOG_LETTER_PARAM(X);
+    LOG_LETTER_PARAM(Y);
+    LOG_LETTER_PARAM(Z);
+    LOG_LETTER_PARAM(U);
+    LOG_LETTER_PARAM(V);
+    LOG_LETTER_PARAM(W);
+    LOG_LETTER_PARAM(R);
+    LOG_LETTER_PARAM(P);
+    LOG_LETTER_PARAM(D);
 
-     LOG_LETTER_PARAM(S);
-     LOG_LETTER_PARAM(F);
-     LOG_LETTER_PARAM(X);
-     LOG_LETTER_PARAM(Y);
-     LOG_LETTER_PARAM(Z);
-     LOG_LETTER_PARAM(U);
-     LOG_LETTER_PARAM(V);
-     LOG_LETTER_PARAM(W);
-     LOG_LETTER_PARAM(R);
-     LOG_LETTER_PARAM(P);
-     LOG_LETTER_PARAM(D);
 
+    // Find command class in registry
+
+    char cmdName[10];
+    snprintf(cmdName, sizeof cmdName, "%c%d", command_letter, command_number);
+    AbstractCommand *cmd = findCommand(cmdName);
+
+    if(cmd == nullptr) return parserReturn::UNKNOWN_COMMAND;
+
+    Debugger_log(DBG, "Found command: %s", cmd->getName());
+
+    if(!cmdCtx->setCommand(cmd)) return parserReturn::CONTEXT_NOT_READY;
+    cmdCtx->do_preFlightCheck();
+    cmdCtx->do_init();
+
+    if(cmdCtx->isCmdSync()) {
+        cmdCtx->do_run();
+        cmdCtx->do_cleanup();
+        return parserReturn::OK_SYNC;
+    }
+
+    return parserReturn::OK_ASYNC;
 }
 
-void Stm32GcodeRunner::Parser::parseString(const char *inputString) {
+Stm32GcodeRunner::Parser::parserReturn Stm32GcodeRunner::Parser::parseString(const char *inputString) {
     return parseString(inputString, strlen(inputString));
+}
+
+Stm32GcodeRunner::Parser::parserReturn Stm32GcodeRunner::Parser::parseString(const char *inputString, uint32_t strlen) {
+    CommandContext cmdCtx;
+    return parseString(&cmdCtx, inputString, strlen);
+}
+
+Stm32GcodeRunner::Parser::registerCommandReturn
+Stm32GcodeRunner::Parser::registerCommand(Stm32GcodeRunner::AbstractCommand *cmd) {
+
+    Debugger_log(DBG, "Stm32GcodeRunner::Parser::registerCommand(%s *cmd)", cmd->getName());
+
+    // Check, if command is already registered
+    for (const auto &item: cmdRegistry) {
+        if (item == nullptr) continue;
+        if (strcmp(item->getName(), cmd->getName()) == 0) {
+            // Found
+            return registerCommandReturn::CMD_ALREADY_REGISTERED;
+        }
+    }
+
+    for (auto &item: cmdRegistry) {
+        if (item == nullptr) {
+            item = cmd;
+            return registerCommandReturn::SUCCESS;
+        }
+    }
+
+    return registerCommandReturn::CMD_REGISTRY_FULL;
+}
+
+Stm32GcodeRunner::AbstractCommand *Stm32GcodeRunner::Parser::findCommand(const char *cmdName) {
+    for (const auto &item: cmdRegistry) {
+        if (item == nullptr) continue;
+        if (strcmp(item->getName(), cmdName) == 0) {
+            // Found
+            return item;
+        }
+    }
+
+    return nullptr;
 }
