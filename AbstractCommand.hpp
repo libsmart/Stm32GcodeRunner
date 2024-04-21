@@ -99,6 +99,8 @@ namespace Stm32GcodeRunner {
 
         bool printf(const char *format, ...);
 
+        void recycle() { Debugger_log(DBG, "%s::cleanup()", getName()); };
+
 
     protected:
         /** true: the command is executed immediately and synchronous. */

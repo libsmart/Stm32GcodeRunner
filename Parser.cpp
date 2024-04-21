@@ -5,6 +5,7 @@
 
 #include "Parser.hpp"
 #include "Stm32ItmLogger.h"
+#include "Stm32GcodeRunner.hpp"
 
 extern Debugger *DBG;
 
@@ -18,7 +19,8 @@ inline void char_to_uppercase(char &c) {
     }
 }
 
-Stm32GcodeRunner::Parser::parserReturn Stm32GcodeRunner::Parser::parseString(CommandContext *cmdCtx, const char *inputString, uint32_t strlen) {
+Stm32GcodeRunner::Parser::parserReturn
+Stm32GcodeRunner::Parser::parseString(AbstractCommand* &cmd, const char *inputString, uint32_t strlen) {
 
     Debugger_log(DBG, "Stm32GcodeRunner::Parser::parseString('%.*s')", strlen, inputString);
 
@@ -145,33 +147,31 @@ Stm32GcodeRunner::Parser::parserReturn Stm32GcodeRunner::Parser::parseString(Com
 
     char cmdName[10];
     snprintf(cmdName, sizeof cmdName, "%c%d", command_letter, command_number);
-    AbstractCommand *cmd = findCommand(cmdName);
+    AbstractCommand *tmpCmd = findCommand(cmdName);
 
-    if(cmd == nullptr) return parserReturn::UNKNOWN_COMMAND;
+    if (tmpCmd == nullptr) return parserReturn::UNKNOWN_COMMAND;
 
-    Debugger_log(DBG, "Found command: %s", cmd->getName());
+//    Debugger_log(DBG, "Found command: %s", cmd->getName());
 
-    if(!cmdCtx->setCommand(cmd)) return parserReturn::CONTEXT_NOT_READY;
-    cmdCtx->do_preFlightCheck();
-    cmdCtx->do_init();
+    cmd = tmpCmd;
+    return parserReturn::OK;
 
-    if(cmdCtx->isCmdSync()) {
-        cmdCtx->do_run();
-        cmdCtx->do_cleanup();
-        return parserReturn::OK_SYNC;
+    /*
+    if (!cmdCtx->setCommand(cmd)) return parserReturn::CONTEXT_NOT_READY;
+
+    switch (Stm32GcodeRunner::worker->enqueueCommandContext(cmdCtx)) {
+        case Worker::enqueueCommandReturn::OK_SYNC:
+            return parserReturn::OK_SYNC;
+
+        case Worker::enqueueCommandReturn::OK_ASYNC:
+            return parserReturn::OK_ASYNC;
+
+        case Worker::enqueueCommandReturn::ERROR:
+            return parserReturn::WORKER_ERROR;
     }
-
-    return parserReturn::OK_ASYNC;
+     */
 }
 
-Stm32GcodeRunner::Parser::parserReturn Stm32GcodeRunner::Parser::parseString(const char *inputString) {
-    return parseString(inputString, strlen(inputString));
-}
-
-Stm32GcodeRunner::Parser::parserReturn Stm32GcodeRunner::Parser::parseString(const char *inputString, uint32_t strlen) {
-    CommandContext cmdCtx;
-    return parseString(&cmdCtx, inputString, strlen);
-}
 
 Stm32GcodeRunner::Parser::registerCommandReturn
 Stm32GcodeRunner::Parser::registerCommand(Stm32GcodeRunner::AbstractCommand *cmd) {

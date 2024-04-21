@@ -8,11 +8,14 @@
 
 #include "tx_api.h"
 #include "Parser.hpp"
+#include "WorkerDynamic.hpp"
 
 namespace Stm32GcodeRunner {
 
     UINT setupThread(TX_BYTE_POOL *byte_pool);
+    extern WorkerDynamic *worker;
     extern Parser parser;
+
 
 }
 

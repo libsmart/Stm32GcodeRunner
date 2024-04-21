@@ -11,10 +11,12 @@
 #include <memory>
 #include "tx_api.h"
 #include "CommandContext.hpp"
-#include "AbstractCommand.hpp"
+//#include "AbstractCommand.hpp"
 
 
 namespace Stm32GcodeRunner {
+
+    class AbstractCommand;
 
     template<typename ConcreteCommand>
     std::shared_ptr<AbstractCommand> dynamic_pointer_cast_dynamic(std::shared_ptr<AbstractCommand> ptr) {
@@ -43,14 +45,10 @@ namespace Stm32GcodeRunner {
 
 
         enum class parserReturn {
-            OK_SYNC, OK_ASYNC, UNKNOWN_COMMAND, CONTEXT_NOT_READY
+            OK, UNKNOWN_COMMAND
         };
 
-        virtual parserReturn parseString(const char *inputString);
-
-        virtual parserReturn parseString(const char *inputString, uint32_t strlen);
-
-        virtual parserReturn parseString(CommandContext *cmdCtx, const char *inputString, uint32_t strlen);
+        virtual parserReturn parseString(AbstractCommand *&cmd, const char *inputString, uint32_t strlen);
 
     private:
         std::array<AbstractCommand *, 10> cmdRegistry{};

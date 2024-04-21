@@ -15,10 +15,14 @@ namespace Stm32GcodeRunner {
 
     class CommandContext {
 
-        friend Parser;
+//        friend Parser;
+        friend Worker;
         friend AbstractCommand;
 
     public:
+
+        bool setCommand(AbstractCommand *command);
+
         size_t outputLength() {
             return cmdOutputBuffer.getLength();
         }
@@ -46,15 +50,10 @@ namespace Stm32GcodeRunner {
 
         void recycle();
 
+        const char *getName();
+
     protected:
-        bool setCommand(AbstractCommand *command) {
-            if (cmd == nullptr) {
-                cmd = command;
-                cmd->setContext(this);
-                return true;
-            }
-            return false;
-        }
+
 
         void do_preFlightCheck();
 

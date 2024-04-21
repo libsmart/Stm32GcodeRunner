@@ -38,6 +38,7 @@ void Stm32GcodeRunner::CommandContext::do_preFlightCheck() {
     } else {
         cmdState = cmdStates::PREFLIGHTCHECK_ERROR;
         cmdOutputBuffer.write("ERROR: preFlightCheck failed\r\n");
+        mustRecycle = true;
     }
 }
 
@@ -48,7 +49,10 @@ void Stm32GcodeRunner::CommandContext::do_init() {
     initResult = cmd->init();
     cmdState = initResult == AbstractCommand::initReturn::READY
                ? cmdStates::INIT_DONE : cmdStates::INIT_ERROR;
-    if (hasError()) cmdOutputBuffer.write("ERROR: init failed\r\n");
+    if (hasError()) {
+        cmdOutputBuffer.write("ERROR: init failed\r\n");
+        mustRecycle = true;
+    }
 }
 
 void Stm32GcodeRunner::CommandContext::do_run() {
@@ -112,6 +116,7 @@ bool Stm32GcodeRunner::CommandContext::isCmdSync() {
 }
 
 void Stm32GcodeRunner::CommandContext::recycle() {
+    cmd->recycle();
     cmd = nullptr;
     cmdState = cmdStates::UNDEF;
 
@@ -126,4 +131,17 @@ void Stm32GcodeRunner::CommandContext::recycle() {
 
 bool Stm32GcodeRunner::CommandContext::isFinished() const {
     return mustRecycle;
+}
+
+const char *Stm32GcodeRunner::CommandContext::getName() {
+    return cmd == nullptr ? nullptr : cmd->getName();
+}
+
+bool Stm32GcodeRunner::CommandContext::setCommand(Stm32GcodeRunner::AbstractCommand *command) {
+    if (cmd == nullptr) {
+        cmd = command;
+        cmd->setContext(this);
+        return true;
+    }
+    return false;
 }
