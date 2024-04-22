@@ -8,6 +8,12 @@
 #include "CommandContext.hpp"
 #include "Stm32GcodeRunner.hpp"
 
+
+struct Stm32GcodeRunner::Worker::mem_t {
+    Stm32GcodeRunner::CommandContext *cmdCtxPtr[COMMAND_CONTEXT_POOL_SIZE]{};
+    Stm32GcodeRunner::CommandContext cmdCtxMem[COMMAND_CONTEXT_POOL_SIZE];
+};
+
 VOID Stm32GcodeRunner::Worker::workerThread() {
     Debugger_log(DBG, "Worker::workerThread() starting");
 
@@ -118,10 +124,9 @@ void Stm32GcodeRunner::Worker::clearCommandContextQueue() {
 }
 
 bool Stm32GcodeRunner::Worker::createCommandContext(CommandContext *&cmdCtx) {
-    cmdCtx = new CommandContext();
-    for (auto &i: cmdCtxStorage) {
-        if (i == nullptr) {
-            i = cmdCtx;
+    for (std::size_t index = 0; index < COMMAND_CONTEXT_POOL_SIZE; ++index) {
+        if (mem->cmdCtxPtr[index] == nullptr) {
+            cmdCtx = mem->cmdCtxPtr[index] = new(&mem->cmdCtxMem[index]) CommandContext();
             return true;
         }
     }
@@ -141,8 +146,8 @@ bool Stm32GcodeRunner::Worker::createCommandContext(Stm32GcodeRunner::CommandCon
 
 Stm32GcodeRunner::CommandContext *
 Stm32GcodeRunner::Worker::getNextCommandContext(Stm32GcodeRunner::CommandContext *prevCmdCtx) {
-    bool found = prevCmdCtx == nullptr;
-    for (auto &i: cmdCtxStorage) {
+    bool found = (prevCmdCtx == nullptr);
+    for (auto &i: mem->cmdCtxPtr) {
         if (found && i != nullptr) {
             return i;
         }
@@ -154,11 +159,16 @@ Stm32GcodeRunner::Worker::getNextCommandContext(Stm32GcodeRunner::CommandContext
 }
 
 void Stm32GcodeRunner::Worker::deleteCommandContext(Stm32GcodeRunner::CommandContext *&cmdCtx) {
-    for (auto &i: cmdCtxStorage) {
-        if (i == cmdCtx) {
+
+    for (std::size_t index = 0; index < COMMAND_CONTEXT_POOL_SIZE; ++index) {
+        if (mem->cmdCtxPtr[index] == cmdCtx) {
             cmdCtx->recycle();
-            delete cmdCtx;
-            i = nullptr;
+            // Call destructor manually, because delete is not used if instance was created
+            // by a placement new
+            cmdCtx->~CommandContext();
+            // Clear pointer and memory
+            mem->cmdCtxPtr[index] = nullptr;
+            memset(&mem->cmdCtxMem[index], 0, sizeof mem->cmdCtxMem[index]);
             return;
         }
     }
@@ -199,5 +209,14 @@ void Stm32GcodeRunner::Worker::terminateAll() {
 
     // Restart worker thread
     Stm32GcodeRunner::worker->resume();
+}
+
+void Stm32GcodeRunner::Worker::createCommandContextPool(Stm32GcodeRunner::Worker::mem_t *pMem) {
+    if(pMem != nullptr) {
+        mem = new(pMem) mem_t;
+        Debugger_log(DBG, "new");
+//        memset(pMem, 0, sizeof(Stm32GcodeRunner::Worker::mem_t));
+//        mem = static_cast<mem_t *>(pMem);
+    }
 }
 

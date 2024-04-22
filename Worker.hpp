@@ -9,15 +9,21 @@
 #include "tx_api.h"
 #include "Stm32ItmLogger.h"
 
-extern Debugger *DBG;
+#define COMMAND_CONTEXT_POOL_SIZE 4
+#define COMMAND_CONTEXT_QUEUE_SIZE 4
+
+//extern Debugger *DBG;
 
 namespace Stm32GcodeRunner {
+
 
     class CommandContext;
     class AbstractCommand;
 
     class Worker {
     public:
+        struct mem_t;
+
         // cmdCtxQueue
         enum class enqueueCommandReturn { OK_SYNC, OK_ASYNC, ERROR };
         enqueueCommandReturn enqueueCommandContext(CommandContext *cmdCtx);
@@ -36,6 +42,8 @@ namespace Stm32GcodeRunner {
         static void terminateCurrent();
         static void terminateAll();
 
+        void createCommandContextPool(mem_t *pMem);;
+
     protected:
         [[noreturn]] VOID workerThread();
 
@@ -43,9 +51,10 @@ namespace Stm32GcodeRunner {
     private:
         CommandContext *currentCmdCtx{};
 //        TX_SEMAPHORE cmdReady{};
-        CommandContext *cmdCtxStorage[10]{};
         TX_QUEUE cmdCtxQueue{};
-        CommandContext *cmdCtxQueueBuffer[10]{};
+        CommandContext *cmdCtxQueueBuffer[COMMAND_CONTEXT_QUEUE_SIZE]{};
+
+        mem_t *mem{};
     };
 }
 

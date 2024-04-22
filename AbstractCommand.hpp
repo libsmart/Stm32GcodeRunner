@@ -7,6 +7,7 @@
 #define LIBSMART_STM32GCODERUNNER_ABSTRACTCOMMAND_HPP
 
 #include "Worker.hpp"
+#include "main.hpp"
 
 namespace Stm32GcodeRunner {
 

@@ -9,6 +9,8 @@
 #include "AbstractCommand.hpp"
 #include "StringBuffer.hpp"
 
+#define OUTPUT_BUFFER_SIZE 192
+
 namespace Stm32GcodeRunner {
 
     class Parser;
@@ -91,8 +93,7 @@ namespace Stm32GcodeRunner {
         AbstractCommand::runReturn runResult = AbstractCommand::runReturn::UNDEF;
         AbstractCommand::cleanupReturn cleanupResult = AbstractCommand::cleanupReturn::UNDEF;
 
-        Stm32Common::StringBuffer<256> cmdOutputBuffer{};
-
+        Stm32Common::StringBuffer<192> cmdOutputBuffer{};
     };
 }
 
