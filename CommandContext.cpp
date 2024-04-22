@@ -111,6 +111,13 @@ void Stm32GcodeRunner::CommandContext::do_cleanup() {
     if (!hasError()) cmdOutputBuffer.write("OK\r\n");
 }
 
+void Stm32GcodeRunner::CommandContext::do_terminate() {
+    cmd->terminate();
+    mustRecycle = true;
+    cmdState = cmdStates::TERMINATED;
+}
+
+
 bool Stm32GcodeRunner::CommandContext::isCmdSync() {
     return cmd->isSync;
 }

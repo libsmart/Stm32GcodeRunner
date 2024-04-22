@@ -11,11 +11,6 @@ Stm32GcodeRunner::AbstractCommand::AbstractCommand() {
 //    Stm32GcodeRunner::parser.registerCommand(this);
 }
 
-bool Stm32GcodeRunner::AbstractCommand::isFinished() {
-    return true;
-//    return cmdState == FINISHED || cmdState == CLEANUP_DONE || cmdState == ERROR;
-}
-
 void Stm32GcodeRunner::AbstractCommand::setRunTimeout(unsigned long timeout) {
     runTimeout = timeout;
 }

@@ -18,19 +18,30 @@ namespace Stm32GcodeRunner {
 
     class Worker {
     public:
+        // cmdCtxQueue
         enum class enqueueCommandReturn { OK_SYNC, OK_ASYNC, ERROR };
         enqueueCommandReturn enqueueCommandContext(CommandContext *cmdCtx);
         CommandContext *getNextCommandContext(CommandContext *prevCmdCtx);
+        void clearCommandContextQueue();
 
+        // Thread
+        bool hasRunningCommandContext();
+        CommandContext *getRunningCommandContext();
+
+        // cmdCtxStorage
         bool createCommandContext(CommandContext *&cmdCtx);
         bool createCommandContext(CommandContext *&cmdCtx, AbstractCommand *cmd);
         void deleteCommandContext(CommandContext *&cmdCtx);
+
+        static void terminateCurrent();
+        static void terminateAll();
 
     protected:
         [[noreturn]] VOID workerThread();
 
 
     private:
+        CommandContext *currentCmdCtx{};
 //        TX_SEMAPHORE cmdReady{};
         CommandContext *cmdCtxStorage[10]{};
         TX_QUEUE cmdCtxQueue{};

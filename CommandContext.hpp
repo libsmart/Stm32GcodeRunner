@@ -63,6 +63,8 @@ namespace Stm32GcodeRunner {
 
         void do_cleanup();
 
+        void do_terminate();
+
 
     private:
         AbstractCommand *cmd{};
@@ -77,7 +79,8 @@ namespace Stm32GcodeRunner {
             RUN,
             RUN_DONE,
             RUN_TIMEOUT,
-            RUN_ERROR
+            RUN_ERROR,
+            TERMINATED
         };
         cmdStates cmdState = cmdStates::UNDEF;
 

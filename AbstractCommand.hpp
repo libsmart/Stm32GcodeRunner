@@ -56,10 +56,17 @@ namespace Stm32GcodeRunner {
             return cleanupReturn::ERROR;
         };
 
+        virtual void terminate() {
+            Debugger_log(DBG, "%s::terminate()", getName());
+        };
+
+        virtual void recycle() {
+            Debugger_log(DBG, "%s::recycle()", getName());
+        };
+
+
         virtual const char *getName() { return "AbstractCommand"; };
 
-
-        bool isFinished();
 
         void setRunTimeout(unsigned long timeout);
 
@@ -99,7 +106,6 @@ namespace Stm32GcodeRunner {
 
         bool printf(const char *format, ...);
 
-        void recycle() { Debugger_log(DBG, "%s::cleanup()", getName()); };
 
 
     protected:
