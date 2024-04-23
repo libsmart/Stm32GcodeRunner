@@ -66,6 +66,11 @@ namespace Stm32GcodeRunner {
         };
 
 
+        virtual void setParam(char paramName, const char * paramString);
+        virtual void setParam(char paramName, long paramLong) {};
+        virtual void setParam(char paramName, double paramDouble) {};
+
+
         virtual const char *getName() { return "AbstractCommand"; };
 
 

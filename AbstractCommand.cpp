@@ -50,3 +50,8 @@ bool Stm32GcodeRunner::AbstractCommand::printf(const char *format, ...) {
     return ret;
 }
 
+void Stm32GcodeRunner::AbstractCommand::setParam(char paramName, const char *paramString) {
+    setParam(paramName, strtol(paramString, nullptr, 10));
+    setParam(paramName, strtod(paramString, nullptr));
+}
+

@@ -11,7 +11,11 @@ extern Debugger *DBG;
 
 #define LOG_LETTER_PARAM(letter) \
      if(pVal_##letter != nullptr) \
-     Debugger_log(DBG, #letter": f=%f  l=%ld", strtod(pVal_##letter, nullptr), strtol(pVal_##letter, nullptr, 10))
+     Debugger_log(DBG, #letter": f=%f  l=%ld", strtod(pVal_##letter, nullptr), strtol(pVal_##letter, nullptr, 10));
+
+#define SET_LETTER_PARAM(letter) \
+     if(pVal_##letter != nullptr) \
+     cmd->setParam(#letter[0], pVal_##letter);
 
 inline void char_to_uppercase(char &c) {
     if (c >= 'a' && c <= 'z') {
@@ -148,12 +152,21 @@ Stm32GcodeRunner::Parser::parseString(AbstractCommand* &cmd, const char *inputSt
     char cmdName[10];
     snprintf(cmdName, sizeof cmdName, "%c%d", command_letter, command_number);
     AbstractCommand *tmpCmd = findCommand(cmdName);
-
     if (tmpCmd == nullptr) return parserReturn::UNKNOWN_COMMAND;
-
-//    Debugger_log(DBG, "Found command: %s", cmd->getName());
-
     cmd = tmpCmd;
+
+    SET_LETTER_PARAM(S);
+    SET_LETTER_PARAM(F);
+    SET_LETTER_PARAM(X);
+    SET_LETTER_PARAM(Y);
+    SET_LETTER_PARAM(Z);
+    SET_LETTER_PARAM(U);
+    SET_LETTER_PARAM(V);
+    SET_LETTER_PARAM(W);
+    SET_LETTER_PARAM(R);
+    SET_LETTER_PARAM(P);
+    SET_LETTER_PARAM(D);
+
     return parserReturn::OK;
 
     /*
