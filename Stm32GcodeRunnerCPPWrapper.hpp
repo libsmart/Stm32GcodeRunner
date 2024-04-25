@@ -15,7 +15,12 @@ extern "C" {
 /**
  * @brief Sets up the thread for running the STM32 G-code runner.
  *
- * This function sets up the thread for running the STM32 G-code runner, allowing it to execute G-code commands.
+ * This function should be called from App_ThreadX_Init() in file app_threadx.c:
+ * @example @code
+ * // Jump to our C++ thread setup function
+ * ret = Stm32GcodeRunner_setupThread(byte_pool);
+ * assert_param(ret == TX_SUCCESS);
+ * @endcode
  *
  * @param byte_pool The byte pool that will be used by the thread for memory allocation.
  * @return UINT Returns TX_SUCCESS if the thread is successfully set up, or an error code if the setup fails.

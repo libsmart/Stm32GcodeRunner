@@ -12,8 +12,6 @@
 #include "Commands/M503.hpp"
 #include "main.hpp"
 
-extern Debugger *DBG;
-
 G0 G0;
 M18 M18;
 M115 M115;
