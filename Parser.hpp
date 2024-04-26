@@ -45,7 +45,7 @@ namespace Stm32GcodeRunner {
 
 
         enum class parserReturn {
-            OK, UNKNOWN_COMMAND
+            OK, WHITESPACE_STRING, GARBAGE_STRING, UNKNOWN_COMMAND
         };
 
         virtual parserReturn parseString(AbstractCommand *&cmd, const char *inputString, uint32_t strlen);

@@ -28,6 +28,9 @@ Stm32GcodeRunner::Parser::parseString(AbstractCommand* &cmd, const char *inputSt
 
     Debugger_log(DBG, "Stm32GcodeRunner::Parser::parseString('%.*s')", strlen, inputString);
 
+    if(strlen == 0) return parserReturn::WHITESPACE_STRING;
+
+    bool nonWhiteSpace = false;
     char command_letter = '?';
     int command_number = -1;
     __attribute__((unused)) const char *pVal_S = nullptr;
@@ -47,7 +50,11 @@ Stm32GcodeRunner::Parser::parseString(AbstractCommand* &cmd, const char *inputSt
         char_to_uppercase(c);
         switch (c) {
             case ' ':
-                // Skip spaces
+            case '\n':
+            case '\r':
+            case '\t':
+            case '\v':
+                // Skip whitespace
                 break;
 
             case 'G':
@@ -55,6 +62,7 @@ Stm32GcodeRunner::Parser::parseString(AbstractCommand* &cmd, const char *inputSt
             case 'M': {
                 // command found
                 command_letter = c;
+                nonWhiteSpace = true;
                 index++;
 
                 // skip spaces
@@ -123,16 +131,19 @@ Stm32GcodeRunner::Parser::parseString(AbstractCommand* &cmd, const char *inputSt
             }
                 break;
             default:
+                nonWhiteSpace = true;
                 break;
         }
     }
 
+    if (!nonWhiteSpace) return parserReturn::WHITESPACE_STRING;
+
     // Call the commands
-    if (command_letter == '?') return parserReturn::UNKNOWN_COMMAND; // no valid command found
-    if (command_number < 0) return parserReturn::UNKNOWN_COMMAND; // no valid command found
+    if (command_letter == '?') return parserReturn::GARBAGE_STRING;
+    if (command_number < 0) return parserReturn::GARBAGE_STRING;
 
 
-    Debugger_log(DBG, "Parsed command: %c%d", command_letter, command_number);
+    Debugger_log(DBG, "Parsed possible command: %c%d", command_letter, command_number);
 
     LOG_LETTER_PARAM(S);
     LOG_LETTER_PARAM(F);

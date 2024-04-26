@@ -37,7 +37,7 @@ void Stm32GcodeRunner::CommandContext::do_preFlightCheck() {
         cmdState = cmdStates::PREFLIGHTCHECK_DONE;
     } else {
         cmdState = cmdStates::PREFLIGHTCHECK_ERROR;
-        cmdOutputBuffer.write("ERROR: preFlightCheck failed\r\n");
+        cmdOutputBuffer.println("ERROR: preFlightCheck failed");
         mustRecycle = true;
     }
 }
@@ -69,7 +69,7 @@ void Stm32GcodeRunner::CommandContext::do_run() {
     if ((cmd->runTimeout > 0) && (cmd->getRunDuration() > cmd->runTimeout)) {
         cmdState = cmdStates::RUN_TIMEOUT;
         runResult = AbstractCommand::runReturn::TIMEOUT;
-        cmd->onRunTimeout();
+        this->onRunTimeout();
     }
 
     if (cmdState == cmdStates::RUN) {
@@ -94,21 +94,23 @@ void Stm32GcodeRunner::CommandContext::do_run() {
             break;
     }
     cmd->runDuration = cmd->getRunDuration();
-    if (hasError()) cmd->onRunError();
-    if (cmdState != cmdStates::RUN) cmd->onRunFinished();
+    if (hasError()) this->onRunError();
+    if (cmdState != cmdStates::RUN) this->onRunFinished();
     if (hasError()) cmdOutputBuffer.write("ERROR: run failed\r\n");
 }
 
 void Stm32GcodeRunner::CommandContext::do_cleanup() {
-    if (mustRecycle) return;
+    if (mustRecycle) return this->onCmdEnd();
     if (cmdState != cmdStates::RUN_DONE &&
         cmdState != cmdStates::RUN_TIMEOUT &&
         cmdState != cmdStates::RUN_ERROR)
-        return;
+        return this->onCmdEnd();
     cleanupResult = cmd->cleanup();
-    mustRecycle = true;
     // cmdOutputBuffer.write("ERROR: cleanup failed\r\n");
     if (!hasError()) cmdOutputBuffer.write("OK\r\n");
+    mustRecycle = true;
+    this->onCleanupFinished();
+    this->onCmdEnd();
 }
 
 void Stm32GcodeRunner::CommandContext::do_terminate() {

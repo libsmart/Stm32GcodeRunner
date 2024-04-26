@@ -104,6 +104,20 @@ namespace Stm32GcodeRunner {
          */
         virtual void onRunFinished() {};
 
+        /**
+         * @brief Virtual function called when the cleanup is finished.
+         *
+         * The function is called regardless of the error status.
+         */
+        virtual void onCleanupFinished() {};
+
+        /**
+         * @brief Virtual function called when the command has ended and is ready for deletion.
+         *
+         * The function is called regardless of the error status.
+         */
+        virtual void onCmdEnd() {};
+
 
     protected:
         bool write(const char *str);
