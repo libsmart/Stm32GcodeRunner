@@ -45,6 +45,8 @@ namespace Stm32GcodeRunner {
 
         const char *getName();
 
+        const char *getCommandLine();
+
         void registerOnRunFinishedFunction(const fn_t &fn) { this->onRunFinishedFn = fn; }
         void registerOnCleanupFinishedFunction(const fn_t &fn) { this->onCleanupFinishedFn = fn; }
         void registerOnCmdEndFunction(const fn_t &fn) { this->onCmdEndFn = fn; }

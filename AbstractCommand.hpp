@@ -63,6 +63,7 @@ namespace Stm32GcodeRunner {
 
         virtual void recycle() {
             Debugger_log(DBG, "%s::recycle()", getName());
+            setCommandLine("", 0);
         };
 
 
@@ -71,8 +72,10 @@ namespace Stm32GcodeRunner {
         virtual void setParam(char paramName, double paramDouble) {};
 
 
-        virtual const char *getName() { return "AbstractCommand"; };
+        virtual void setCommandLine(const char *cmdLine, size_t size);
+        virtual const char *getCommandLine();
 
+        virtual const char *getName() { return "AbstractCommand"; };
 
         void setRunTimeout(unsigned long timeout);
 
@@ -148,10 +151,10 @@ namespace Stm32GcodeRunner {
         unsigned long runTimeout = 0;
         /** Quiet run: no "ok" after run */
         bool quietRun = false;
-
         /** Used to delay debug output */
         unsigned long lastRunDurationDebugOutput = 0;
-
+        /** Stores the originial command line entered */
+        char commandLine[32] = {};
     };
 
 }

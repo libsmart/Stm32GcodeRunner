@@ -22,7 +22,6 @@ bool Stm32GcodeRunner::CommandContext::hasError() {
         case cmdStates::RUN_TIMEOUT:
         case cmdStates::RUN_ERROR:
             void(0);
-
     }
     return true;
 }
@@ -48,7 +47,8 @@ void Stm32GcodeRunner::CommandContext::do_init() {
     cmdState = cmdStates::INIT;
     initResult = cmd->init();
     cmdState = initResult == AbstractCommand::initReturn::READY
-               ? cmdStates::INIT_DONE : cmdStates::INIT_ERROR;
+                   ? cmdStates::INIT_DONE
+                   : cmdStates::INIT_ERROR;
     if (hasError()) {
         cmdOutputBuffer.write("ERROR: init failed\r\n");
         mustRecycle = true;
@@ -63,7 +63,7 @@ void Stm32GcodeRunner::CommandContext::do_run() {
     }
     cmdState = cmdStates::RUN;
 
-//    cmd->runDuration += millis() - cmd->lastRunMillis;
+    //    cmd->runDuration += millis() - cmd->lastRunMillis;
     cmd->lastRunMillis = millis();
 
     if ((cmd->runTimeout > 0) && (cmd->getRunDuration() > cmd->runTimeout)) {
@@ -73,9 +73,7 @@ void Stm32GcodeRunner::CommandContext::do_run() {
     }
 
     if (cmdState == cmdStates::RUN) {
-
         runResult = cmd->run();
-
     }
 
     switch (runResult) {
@@ -117,8 +115,8 @@ void Stm32GcodeRunner::CommandContext::do_terminate() {
     cmd->terminate();
     mustRecycle = true;
     cmdState = cmdStates::TERMINATED;
+    cmdOutputBuffer.printf("NOTICE: command `%s` terminated\r\nOK\r\n", getCommandLine());
 }
-
 
 bool Stm32GcodeRunner::CommandContext::isCmdSync() {
     return cmd->isSync;
@@ -145,6 +143,11 @@ bool Stm32GcodeRunner::CommandContext::isFinished() const {
 const char *Stm32GcodeRunner::CommandContext::getName() {
     return cmd == nullptr ? nullptr : cmd->getName();
 }
+
+const char *Stm32GcodeRunner::CommandContext::getCommandLine() {
+    return cmd == nullptr ? nullptr : cmd->getCommandLine();
+}
+
 
 bool Stm32GcodeRunner::CommandContext::setCommand(Stm32GcodeRunner::AbstractCommand *command) {
     if (cmd == nullptr) {

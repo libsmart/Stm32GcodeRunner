@@ -178,6 +178,9 @@ Stm32GcodeRunner::Parser::parseString(AbstractCommand* &cmd, const char *inputSt
     SET_LETTER_PARAM(P);
     SET_LETTER_PARAM(D);
 
+
+    cmd->setCommandLine(inputString, strlen);
+
     return parserReturn::OK;
 
     /*

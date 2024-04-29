@@ -37,7 +37,7 @@ namespace Stm32GcodeRunner {
         // cmdCtxStorage
         bool createCommandContext(CommandContext *&cmdCtx);
         bool createCommandContext(CommandContext *&cmdCtx, AbstractCommand *cmd);
-        void deleteCommandContext(CommandContext *&cmdCtx);
+        void deleteCommandContext(CommandContext *cmdCtx);
 
         static void terminateCurrent();
         static void terminateAll();

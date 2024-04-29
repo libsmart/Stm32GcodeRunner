@@ -11,6 +11,16 @@ Stm32GcodeRunner::AbstractCommand::AbstractCommand() {
 //    Stm32GcodeRunner::parser.registerCommand(this);
 }
 
+void Stm32GcodeRunner::AbstractCommand::setCommandLine(const char *cmdLine, const size_t size) {
+    auto sz = std::min(size, sizeof commandLine - 1);
+    memset(commandLine, 0, sizeof commandLine);
+    memcpy(commandLine, cmdLine, sz);
+}
+
+const char * Stm32GcodeRunner::AbstractCommand::getCommandLine() {
+    return commandLine;
+}
+
 void Stm32GcodeRunner::AbstractCommand::setRunTimeout(unsigned long timeout) {
     runTimeout = timeout;
 }

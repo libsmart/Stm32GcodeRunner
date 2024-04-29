@@ -158,7 +158,7 @@ Stm32GcodeRunner::Worker::getNextCommandContext(Stm32GcodeRunner::CommandContext
     return nullptr;
 }
 
-void Stm32GcodeRunner::Worker::deleteCommandContext(Stm32GcodeRunner::CommandContext *&cmdCtx) {
+void Stm32GcodeRunner::Worker::deleteCommandContext(Stm32GcodeRunner::CommandContext *cmdCtx) {
 
     for (std::size_t index = 0; index < COMMAND_CONTEXT_POOL_SIZE; ++index) {
         if (mem->cmdCtxPtr[index] == cmdCtx) {
