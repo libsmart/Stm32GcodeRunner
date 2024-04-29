@@ -10,12 +10,13 @@
 #include "Parser.hpp"
 #include "WorkerDynamic.hpp"
 
+#define WORKER_THREAD_STACK_SIZE 1024
+
 namespace Stm32GcodeRunner {
 
     UINT setupThread(TX_BYTE_POOL *byte_pool);
     extern WorkerDynamic *worker;
-    extern Parser parser;
-
+    extern Parser *parser;
 
 }
 

@@ -19,9 +19,6 @@ VOID Stm32GcodeRunner::Worker::workerThread() {
 
     UINT ret{};
     CommandContext *cmdCtx{};
-//    UINT state{};
-//    TX_THREAD *thread = tx_thread_identify();
-
 
     // Create queue
     tx_queue_create(&cmdCtxQueue, const_cast<CHAR *>("Command queue"), sizeof cmdCtxQueueBuffer[0] / 4,
@@ -62,7 +59,6 @@ VOID Stm32GcodeRunner::Worker::workerThread() {
 */
         tx_thread_sleep(1);
     };
-//    for (;;) { tx_thread_sleep(1); }
 }
 
 Stm32GcodeRunner::Worker::enqueueCommandReturn Stm32GcodeRunner::Worker::enqueueCommandContext(CommandContext *cmdCtx) {
@@ -120,7 +116,7 @@ void Stm32GcodeRunner::Worker::clearCommandContextQueue() {
         }
     } while (enqueued > 0);
 
-//    tx_queue_flush(&cmdCtxQueue);
+    //    tx_queue_flush(&cmdCtxQueue);
 }
 
 bool Stm32GcodeRunner::Worker::createCommandContext(CommandContext *&cmdCtx) {
@@ -135,7 +131,6 @@ bool Stm32GcodeRunner::Worker::createCommandContext(CommandContext *&cmdCtx) {
 
 bool Stm32GcodeRunner::Worker::createCommandContext(Stm32GcodeRunner::CommandContext *&cmdCtx,
                                                     Stm32GcodeRunner::AbstractCommand *cmd) {
-
     if (createCommandContext(cmdCtx)) {
         cmdCtx->setCommand(cmd);
         enqueueCommandContext(cmdCtx);
@@ -159,7 +154,6 @@ Stm32GcodeRunner::Worker::getNextCommandContext(Stm32GcodeRunner::CommandContext
 }
 
 void Stm32GcodeRunner::Worker::deleteCommandContext(Stm32GcodeRunner::CommandContext *cmdCtx) {
-
     for (std::size_t index = 0; index < COMMAND_CONTEXT_POOL_SIZE; ++index) {
         if (mem->cmdCtxPtr[index] == cmdCtx) {
             cmdCtx->recycle();
@@ -211,12 +205,19 @@ void Stm32GcodeRunner::Worker::terminateAll() {
     Stm32GcodeRunner::worker->resume();
 }
 
-void Stm32GcodeRunner::Worker::createCommandContextPool(Stm32GcodeRunner::Worker::mem_t *pMem) {
-    if(pMem != nullptr) {
-        mem = new(pMem) mem_t;
-        Debugger_log(DBG, "new");
-//        memset(pMem, 0, sizeof(Stm32GcodeRunner::Worker::mem_t));
-//        mem = static_cast<mem_t *>(pMem);
-    }
+void Stm32GcodeRunner::Worker::createCommandContextPool(mem_t *pMem) {
+    createCommandContextPool(pMem, 0);
+}
+
+void Stm32GcodeRunner::Worker::createCommandContextPool(mem_t *pMem, size_t size) {
+    assert_param(pMem != nullptr);
+    // size = size == 0 ? getCommandContextPoolSizeRequirement() : size;
+    assert_param(size == 0 || size >= sizeof(mem_t));
+    memset(pMem, 0, sizeof(mem_t));
+    mem = new(pMem) mem_t;
+}
+
+size_t Stm32GcodeRunner::Worker::getCommandContextPoolSizeRequirement() {
+    return sizeof(mem_t);
 }
 
