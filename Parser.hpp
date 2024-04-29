@@ -34,9 +34,9 @@ namespace Stm32GcodeRunner {
             SUCCESS, CMD_ALREADY_REGISTERED, CMD_REGISTRY_FULL
         };
 
-        registerCommandReturn registerCommand(AbstractCommand *cmd);
+        static registerCommandReturn registerCommand(AbstractCommand *cmd);
 
-        AbstractCommand *findCommand(const char * cmdName);
+        static AbstractCommand *findCommand(const char * cmdName);
 
         /**
          * NOT IMPLEMENTED.
@@ -51,7 +51,7 @@ namespace Stm32GcodeRunner {
         virtual parserReturn parseString(AbstractCommand *&cmd, const char *inputString, uint32_t strlen);
 
     private:
-        std::array<AbstractCommand *, 10> cmdRegistry{};
+        static std::array<AbstractCommand *, 10> cmdRegistry;
     };
 
 }

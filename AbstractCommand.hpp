@@ -10,11 +10,9 @@
 #include "main.hpp"
 
 namespace Stm32GcodeRunner {
-
     class CommandContext;
 
     class AbstractCommand {
-
         friend Worker;
         friend CommandContext;
 
@@ -67,12 +65,17 @@ namespace Stm32GcodeRunner {
         };
 
 
-        virtual void setParam(char paramName, const char * paramString);
-        virtual void setParam(char paramName, long paramLong) {};
-        virtual void setParam(char paramName, double paramDouble) {};
+        virtual void setParam(char paramName, const char *paramString);
+
+        virtual void setParam(char paramName, long paramLong) {
+        };
+
+        virtual void setParam(char paramName, double paramDouble) {
+        };
 
 
         virtual void setCommandLine(const char *cmdLine, size_t size);
+
         virtual const char *getCommandLine();
 
         virtual const char *getName() { return "AbstractCommand"; };
@@ -86,6 +89,8 @@ namespace Stm32GcodeRunner {
         bool isQuietRun() const;
 
 
+        virtual AbstractCommand *factory() { return new AbstractCommand; };
+
     protected:
         /**
          * @brief This virtual function is called when the run timeout occurs.
@@ -93,34 +98,38 @@ namespace Stm32GcodeRunner {
          * This function is a placeholder that can be overridden in derived classes to implement
          * specific functionality when the run timeout occurs.
          */
-        virtual void onRunTimeout() {};
+        virtual void onRunTimeout() {
+        };
 
         /**
          * @brief This virtual function is called when an error occurs during the execution of the command.
          */
-        virtual void onRunError() {};
+        virtual void onRunError() {
+        };
 
         /**
          * @brief Virtual function called when the execution of the command is finished.
          *
          * The function is called regardless of the error status.
          */
-        virtual void onRunFinished() {};
+        virtual void onRunFinished() {
+        };
 
         /**
          * @brief Virtual function called when the cleanup is finished.
          *
          * The function is called regardless of the error status.
          */
-        virtual void onCleanupFinished() {};
+        virtual void onCleanupFinished() {
+        };
 
         /**
          * @brief Virtual function called when the command has ended and is ready for deletion.
          *
          * The function is called regardless of the error status.
          */
-        virtual void onCmdEnd() {};
-
+        virtual void onCmdEnd() {
+        };
 
     protected:
         bool write(const char *str);
@@ -129,12 +138,9 @@ namespace Stm32GcodeRunner {
 
         bool printf(const char *format, ...);
 
-
-
     protected:
         /** true: the command is executed immediately and synchronous. */
         bool isSync = false;
-
 
     private:
         CommandContext *ctx{};
@@ -156,7 +162,6 @@ namespace Stm32GcodeRunner {
         /** Stores the originial command line entered */
         char commandLine[32] = {};
     };
-
 }
 
 #endif //LIBSMART_STM32GCODERUNNER_ABSTRACTCOMMAND_HPP

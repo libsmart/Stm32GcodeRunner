@@ -8,7 +8,8 @@
 #include "Helper.hpp"
 
 Stm32GcodeRunner::AbstractCommand::AbstractCommand() {
-//    Stm32GcodeRunner::parser.registerCommand(this);
+    auto ret = Parser::registerCommand(this);
+    assert_param(ret == Parser::registerCommandReturn::SUCCESS);
 }
 
 void Stm32GcodeRunner::AbstractCommand::setCommandLine(const char *cmdLine, const size_t size) {

@@ -4,18 +4,10 @@
  */
 
 #include "Stm32GcodeRunner.hpp"
+#include "Helper.hpp"
 #include "Stm32ItmLogger.h"
 #include "WorkerDynamic.hpp"
-#include "Commands/G0.hpp"
-#include "Commands/M18.hpp"
-#include "Commands/M115.hpp"
-#include "Commands/M503.hpp"
 #include "main.hpp"
-
-G0 G0;
-M18 M18;
-M115 M115;
-M503 M503;
 
 Stm32GcodeRunner::Parser *Stm32GcodeRunner::parser = {};
 Stm32GcodeRunner::WorkerDynamic *Stm32GcodeRunner::worker = {};
@@ -37,12 +29,6 @@ UINT Stm32GcodeRunner::setupThread(TX_BYTE_POOL *byte_pool) {
     }
     // Create parser obejct
     parser = new(memPtr) Parser();
-
-
-    parser->registerCommand(&G0);
-    parser->registerCommand(&M18);
-    parser->registerCommand(&M115);
-    parser->registerCommand(&M503);
 
 
     // Allocate memory for the worker object

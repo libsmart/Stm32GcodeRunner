@@ -199,6 +199,7 @@ Stm32GcodeRunner::Parser::parseString(AbstractCommand* &cmd, const char *inputSt
      */
 }
 
+std::array<Stm32GcodeRunner::AbstractCommand *, 10> Stm32GcodeRunner::Parser::cmdRegistry = {};
 
 Stm32GcodeRunner::Parser::registerCommandReturn
 Stm32GcodeRunner::Parser::registerCommand(Stm32GcodeRunner::AbstractCommand *cmd) {
