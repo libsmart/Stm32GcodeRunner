@@ -1,0 +1,18 @@
+[submodule "examples/stm32f1_usb_serial/Lib/Stm32Serial"]
+	path = examples/stm32f1_usb_serial/Lib/Stm32Serial
+	url = https://github.com/libsmart/Stm32Serial.git
+[submodule "examples/stm32f1_usb_serial/Lib/Stm32Common"]
+	path = examples/stm32f1_usb_serial/Lib/Stm32Common
+	url = https://github.com/libsmart/Stm32Common.git
+[submodule "examples/stm32f4_usb_serial/Lib/Stm32Common"]
+	path = examples/stm32f4_usb_serial/Lib/Stm32Common
+	url = https://github.com/libsmart/Stm32Common.git
+[submodule "examples/stm32f4_usb_serial/Lib/Stm32ItmLogger"]
+	path = examples/stm32f4_usb_serial/Lib/Stm32ItmLogger
+	url = https://github.com/libsmart/Stm32ItmLogger.git
+[submodule "examples/stm32f4_usb_serial/Lib/Stm32ThreadxThread"]
+	path = examples/stm32f4_usb_serial/Lib/Stm32ThreadxThread
+	url = https://github.com/libsmart/Stm32ThreadxThread.git
+[submodule "examples/stm32f4_usb_serial/Lib/Stm32UsbX"]
+	path = examples/stm32f4_usb_serial/Lib/Stm32UsbX
+	url = https://github.com/libsmart/Stm32UsbX.git
