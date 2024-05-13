@@ -4,6 +4,7 @@
  */
 
 #include "Stm32GcodeRunner.hpp"
+#include "globals.hpp"
 #include "Helper.hpp"
 #include "Stm32ItmLogger.h"
 #include "WorkerDynamic.hpp"
@@ -13,22 +14,24 @@ Stm32GcodeRunner::Parser *Stm32GcodeRunner::parser = {};
 Stm32GcodeRunner::WorkerDynamic *Stm32GcodeRunner::worker = {};
 
 UINT Stm32GcodeRunner::setupThread(TX_BYTE_POOL *byte_pool) {
-    Debugger_log(DBG, "Stm32GcodeRunner::setupThread()");
+    logger.println("Stm32GcodeRunner::setupThread()");
+
 
     UINT ret = TX_SUCCESS;
     UCHAR *memPtr = nullptr;
 
 
     // Allocate memory for the parser object
-    ret = tx_byte_allocate(byte_pool, reinterpret_cast<void **>(&memPtr),
-                           sizeof(Parser),
-                           TX_NO_WAIT);
-    if (ret != TX_SUCCESS) {
-        Debugger_log(DBG, "%lu: tx_byte_allocate() = 0x%02x", millis(), ret);
-        assert_param(ret != TX_SUCCESS);
-    }
+    // ret = tx_byte_allocate(byte_pool, reinterpret_cast<void **>(&memPtr),
+    //                        sizeof(Parser),
+    //                        TX_NO_WAIT);
+    // if (ret != TX_SUCCESS) {
+    //     Debugger_log(DBG, "%lu: tx_byte_allocate() = 0x%02x", millis(), ret);
+    //     assert_param(ret != TX_SUCCESS);
+    // }
     // Create parser obejct
-    parser = new(memPtr) Parser();
+    parser = &Parser::getInstance();
+    Parser::setLogger(&logger);
 
 
     // Allocate memory for the worker object
@@ -45,13 +48,13 @@ UINT Stm32GcodeRunner::setupThread(TX_BYTE_POOL *byte_pool) {
 
     // Allocate stack for the worker thread
     ret = tx_byte_allocate(byte_pool, reinterpret_cast<void **>(&memPtr),
-                           WORKER_THREAD_STACK_SIZE,
+                           LIBSMART_GCODERUNNER_WORKER_THREAD_STACK_SIZE,
                            TX_NO_WAIT);
     if (ret != TX_SUCCESS) {
         Debugger_log(DBG, "%lu: tx_byte_allocate() = 0x%02x", millis(), ret);
         assert_param(ret != TX_SUCCESS);
     }
-    worker->setStack(memPtr, WORKER_THREAD_STACK_SIZE);
+    worker->setStack(memPtr, LIBSMART_GCODERUNNER_WORKER_THREAD_STACK_SIZE);
 
 
     // Allocate memory for the context pool

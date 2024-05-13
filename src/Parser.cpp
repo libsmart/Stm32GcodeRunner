@@ -4,14 +4,12 @@
  */
 
 #include "Parser.hpp"
-#include "Stm32ItmLogger.h"
 #include "Stm32GcodeRunner.hpp"
-
-extern Debugger *DBG;
+#include "AbstractCommand.hpp"
 
 #define LOG_LETTER_PARAM(letter) \
      if(pVal_##letter != nullptr) \
-     Debugger_log(DBG, #letter": f=%f  l=%ld", strtod(pVal_##letter, nullptr), strtol(pVal_##letter, nullptr, 10));
+     log()->printf(#letter": f=%f  l=%ld", strtod(pVal_##letter, nullptr), strtol(pVal_##letter, nullptr, 10));
 
 #define SET_LETTER_PARAM(letter) \
      if(pVal_##letter != nullptr) \
@@ -23,12 +21,12 @@ inline void char_to_uppercase(char &c) {
     }
 }
 
-Stm32GcodeRunner::Parser::parserReturn
-Stm32GcodeRunner::Parser::parseString(AbstractCommand* &cmd, const char *inputString, uint32_t strlen) {
+using namespace Stm32GcodeRunner;
 
-    Debugger_log(DBG, "Stm32GcodeRunner::Parser::parseString('%.*s')", strlen, inputString);
+Parser::parserReturn Parser::parseString(AbstractCommand * &cmd, const char *inputString, uint32_t strlen) {
+    log()->printf("Stm32GcodeRunner::Parser::parseString('%.*s')\r\n", strlen, inputString);
 
-    if(strlen == 0) return parserReturn::WHITESPACE_STRING;
+    if (strlen == 0) return parserReturn::WHITESPACE_STRING;
 
     bool nonWhiteSpace = false;
     char command_letter = '?';
@@ -129,7 +127,7 @@ Stm32GcodeRunner::Parser::parseString(AbstractCommand* &cmd, const char *inputSt
                     }
                 }
             }
-                break;
+            break;
             default:
                 nonWhiteSpace = true;
                 break;
@@ -143,7 +141,7 @@ Stm32GcodeRunner::Parser::parseString(AbstractCommand* &cmd, const char *inputSt
     if (command_number < 0) return parserReturn::GARBAGE_STRING;
 
 
-    Debugger_log(DBG, "Parsed possible command: %c%d", command_letter, command_number);
+    log()->printf("Parsed possible command: %c%d\r\n", command_letter, command_number);
 
     LOG_LETTER_PARAM(S);
     LOG_LETTER_PARAM(F);
@@ -199,12 +197,10 @@ Stm32GcodeRunner::Parser::parseString(AbstractCommand* &cmd, const char *inputSt
      */
 }
 
-std::array<Stm32GcodeRunner::AbstractCommand *, 10> Stm32GcodeRunner::Parser::cmdRegistry = {};
+Parser::cmdRegistryType Parser::cmdRegistry = {};
 
-Stm32GcodeRunner::Parser::registerCommandReturn
-Stm32GcodeRunner::Parser::registerCommand(Stm32GcodeRunner::AbstractCommand *cmd) {
-
-    Debugger_log(DBG, "Stm32GcodeRunner::Parser::registerCommand(%s *cmd)", cmd->getName());
+Parser::registerCommandReturn Parser::registerCommand(AbstractCommand *cmd) {
+    log()->printf("Stm32GcodeRunner::Parser::registerCommand(%s *cmd)\r\n", cmd->getName());
 
     // Check, if command is already registered
     for (const auto &item: cmdRegistry) {
@@ -225,7 +221,7 @@ Stm32GcodeRunner::Parser::registerCommand(Stm32GcodeRunner::AbstractCommand *cmd
     return registerCommandReturn::CMD_REGISTRY_FULL;
 }
 
-Stm32GcodeRunner::AbstractCommand *Stm32GcodeRunner::Parser::findCommand(const char *cmdName) {
+AbstractCommand *Parser::findCommand(const char *cmdName) {
     for (const auto &item: cmdRegistry) {
         if (item == nullptr) continue;
         if (strcmp(item->getName(), cmdName) == 0) {

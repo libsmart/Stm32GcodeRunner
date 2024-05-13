@@ -61,6 +61,10 @@ bool Stm32GcodeRunner::AbstractCommand::printf(const char *format, ...) {
     return ret;
 }
 
+Stm32GcodeRunner::CommandContext::cmdOutputBufferClass * Stm32GcodeRunner::AbstractCommand::out() {
+    return &ctx->cmdOutputBuffer;
+}
+
 void Stm32GcodeRunner::AbstractCommand::setParam(char paramName, const char *paramString) {
     setParam(paramName, strtol(paramString, nullptr, 10));
     setParam(paramName, strtod(paramString, nullptr));

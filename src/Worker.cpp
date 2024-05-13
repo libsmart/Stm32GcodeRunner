@@ -4,10 +4,13 @@
  */
 
 #include "Worker.hpp"
+#include <main.h>
 #include "Helper.hpp"
 #include "CommandContext.hpp"
 #include "Stm32GcodeRunner.hpp"
+#include "Stm32ItmLogger.h"
 
+extern Debugger *DBG;
 
 struct Stm32GcodeRunner::Worker::mem_t {
     Stm32GcodeRunner::CommandContext *cmdCtxPtr[COMMAND_CONTEXT_POOL_SIZE]{};

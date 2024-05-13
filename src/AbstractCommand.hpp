@@ -6,11 +6,11 @@
 #ifndef LIBSMART_STM32GCODERUNNER_ABSTRACTCOMMAND_HPP
 #define LIBSMART_STM32GCODERUNNER_ABSTRACTCOMMAND_HPP
 
+#include "CommandContext.hpp"
 #include "Worker.hpp"
 #include "main.hpp"
 
 namespace Stm32GcodeRunner {
-    class CommandContext;
 
     class AbstractCommand {
         friend Worker;
@@ -137,6 +137,8 @@ namespace Stm32GcodeRunner {
         bool write(const void *in, size_t strlen);
 
         bool printf(const char *format, ...);
+
+        CommandContext::cmdOutputBufferClass *out();
 
     protected:
         /** true: the command is executed immediately and synchronous. */

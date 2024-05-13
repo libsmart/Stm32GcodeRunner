@@ -7,12 +7,9 @@
 #define LIBSMART_STM32GCODERUNNER_WORKER_HPP
 
 #include "tx_api.h"
-#include "Stm32ItmLogger.h"
 
 #define COMMAND_CONTEXT_POOL_SIZE 4
 #define COMMAND_CONTEXT_QUEUE_SIZE 4
-
-//extern Debugger *DBG;
 
 namespace Stm32GcodeRunner {
     class CommandContext;

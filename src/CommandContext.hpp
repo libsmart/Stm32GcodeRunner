@@ -7,14 +7,13 @@
 #define LIBSMART_STM32GCODERUNNER_COMMANDCONTEXT_HPP
 
 #include <functional>
-
-#include "AbstractCommand.hpp"
 #include "StringBuffer.hpp"
+#include "Worker.hpp"
 
 #define OUTPUT_BUFFER_SIZE 192
 
 namespace Stm32GcodeRunner {
-    class Parser;
+    class AbstractCommand;
 
     class CommandContext {
         //        friend Parser;
@@ -70,49 +69,33 @@ namespace Stm32GcodeRunner {
          * This function is a placeholder that can be overridden in derived classes to implement
          * specific functionality when the run timeout occurs.
          */
-        virtual void onRunTimeout() {
-            cmd->onRunTimeout();
-        };
+        virtual void onRunTimeout();
 
         /**
          * @brief This virtual function is called when an error occurs during the execution of the command.
          */
-        virtual void onRunError() {
-            cmd->onRunError();
-        };
+        virtual void onRunError();
 
         /**
          * @brief Virtual function called when the execution of the command is finished.
          *
          * The function is called regardless of the error status.
          */
-        virtual void onRunFinished() {
-            cmd->onRunFinished();
-            onRunFinishedFn();
-        };
+        virtual void onRunFinished();
 
         /**
          * @brief Virtual function called when the cleanup is finished.
          *
          * The function is called regardless of the error status.
          */
-        virtual void onCleanupFinished() {
-            Debugger_log(DBG, "Stm32GcodeRunner::CommandContext::onCleanupFinished()");
-            cmd->onCleanupFinished();
-            onCleanupFinishedFn();
-        };
+        virtual void onCleanupFinished();
 
         /**
          * @brief Virtual function called when the command has ended and is ready for deletion.
          *
          * The function is called regardless of the error status.
          */
-        virtual void onCmdEnd() {
-            Debugger_log(DBG, "Stm32GcodeRunner::CommandContext::onCmdEnd()");
-            if(cmdOutputBuffer.getLength() > 0) onWriteFn();
-            cmd->onCmdEnd();
-            onCmdEndFn();
-        };
+        virtual void onCmdEnd();;
 
 
     private:
@@ -135,10 +118,12 @@ namespace Stm32GcodeRunner {
 
         bool mustRecycle = false;
 
+        /*
         AbstractCommand::preFlightCheckReturn preFlightCheckResult = AbstractCommand::preFlightCheckReturn::UNDEF;
         AbstractCommand::initReturn initResult = AbstractCommand::initReturn::UNDEF;
         AbstractCommand::runReturn runResult = AbstractCommand::runReturn::UNDEF;
         AbstractCommand::cleanupReturn cleanupResult = AbstractCommand::cleanupReturn::UNDEF;
+        */
 
         class cmdOutputBufferClass final : public Stm32Common::StringBuffer<192> {
         public:

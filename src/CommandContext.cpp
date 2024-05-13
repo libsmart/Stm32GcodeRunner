@@ -5,6 +5,14 @@
 
 #include "CommandContext.hpp"
 #include "Helper.hpp"
+#include "AbstractCommand.hpp"
+
+using namespace Stm32GcodeRunner;
+AbstractCommand::preFlightCheckReturn preFlightCheckResult = AbstractCommand::preFlightCheckReturn::UNDEF;
+AbstractCommand::initReturn initResult = AbstractCommand::initReturn::UNDEF;
+AbstractCommand::runReturn runResult = AbstractCommand::runReturn::UNDEF;
+AbstractCommand::cleanupReturn cleanupResult = AbstractCommand::cleanupReturn::UNDEF;
+
 
 bool Stm32GcodeRunner::CommandContext::hasError() {
     switch (cmdState) {
@@ -116,6 +124,32 @@ void Stm32GcodeRunner::CommandContext::do_terminate() {
     mustRecycle = true;
     cmdState = cmdStates::TERMINATED;
     cmdOutputBuffer.printf("NOTICE: command `%s` terminated\r\nOK\r\n", getCommandLine());
+}
+
+void Stm32GcodeRunner::CommandContext::onRunTimeout() {
+    cmd->onRunTimeout();
+}
+
+void Stm32GcodeRunner::CommandContext::onRunError() {
+    cmd->onRunError();
+}
+
+void Stm32GcodeRunner::CommandContext::onRunFinished() {
+    cmd->onRunFinished();
+    onRunFinishedFn();
+}
+
+void Stm32GcodeRunner::CommandContext::onCleanupFinished() {
+    Debugger_log(DBG, "Stm32GcodeRunner::CommandContext::onCleanupFinished()");
+    cmd->onCleanupFinished();
+    onCleanupFinishedFn();
+}
+
+void Stm32GcodeRunner::CommandContext::onCmdEnd() {
+    Debugger_log(DBG, "Stm32GcodeRunner::CommandContext::onCmdEnd()");
+    if(cmdOutputBuffer.getLength() > 0) onWriteFn();
+    cmd->onCmdEnd();
+    onCmdEndFn();
 }
 
 bool Stm32GcodeRunner::CommandContext::isCmdSync() {

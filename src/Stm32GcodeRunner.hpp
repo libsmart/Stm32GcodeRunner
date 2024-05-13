@@ -6,11 +6,11 @@
 #ifndef LIBSMART_STM32GCODERUNNER_STM32GCODERUNNER_HPP
 #define LIBSMART_STM32GCODERUNNER_STM32GCODERUNNER_HPP
 
+#include <libsmart_config.hpp>
 #include "tx_api.h"
+#include "AbstractCommand.hpp"
 #include "Parser.hpp"
 #include "WorkerDynamic.hpp"
-
-#define WORKER_THREAD_STACK_SIZE 1024
 
 namespace Stm32GcodeRunner {
 

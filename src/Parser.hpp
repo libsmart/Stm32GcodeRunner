@@ -6,42 +6,41 @@
 #ifndef LIBSMART_STM32GCODERUNNER_PARSER_HPP
 #define LIBSMART_STM32GCODERUNNER_PARSER_HPP
 
+#include <libsmart_config.hpp>
 #include <cstdint>
 #include <array>
 #include <memory>
 #include "tx_api.h"
 #include "CommandContext.hpp"
-//#include "AbstractCommand.hpp"
-
+#include "Singleton.hpp"
+#include "StaticLoggable.hpp"
 
 namespace Stm32GcodeRunner {
-
     class AbstractCommand;
 
     template<typename ConcreteCommand>
     std::shared_ptr<AbstractCommand> dynamic_pointer_cast_dynamic(std::shared_ptr<AbstractCommand> ptr) {
-        if (dynamic_cast<ConcreteCommand*>(ptr.get())) {
+        if (dynamic_cast<ConcreteCommand *>(ptr.get())) {
             return std::dynamic_pointer_cast<ConcreteCommand>(ptr);
         }
         return nullptr;
     }
 
-    class Parser {
+    class Parser : public Stm32Common::Singleton<Parser>, public Stm32ItmLogger::StaticLoggable {
     public:
-        Parser() {};
-
         enum class registerCommandReturn {
             SUCCESS, CMD_ALREADY_REGISTERED, CMD_REGISTRY_FULL
         };
 
         static registerCommandReturn registerCommand(AbstractCommand *cmd);
 
-        static AbstractCommand *findCommand(const char * cmdName);
+        static AbstractCommand *findCommand(const char *cmdName);
 
         /**
          * NOT IMPLEMENTED.
          */
-        virtual VOID parserThread() {}
+        virtual VOID parserThread() {
+        }
 
 
         enum class parserReturn {
@@ -51,9 +50,9 @@ namespace Stm32GcodeRunner {
         virtual parserReturn parseString(AbstractCommand *&cmd, const char *inputString, uint32_t strlen);
 
     private:
-        static std::array<AbstractCommand *, 10> cmdRegistry;
+        using cmdRegistryType = std::array<AbstractCommand *, LIBSMART_GCODERUNNER_COMMAND_REGISTRY_SIZE>;
+        static cmdRegistryType cmdRegistry;
     };
-
 }
 
 #endif //LIBSMART_STM32GCODERUNNER_PARSER_HPP
