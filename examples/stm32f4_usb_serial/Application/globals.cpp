@@ -9,14 +9,6 @@
  */
 
 #include "globals.hpp"
-#include "main.h"
-
-//uint32_t micros() {
-//    uint32_t micros = HAL_GetTick() * 1000;  // Millisekunden in Mikrosekunden umrechnen
-//    micros += (SysTick->LOAD - SysTick->VAL) /
-//              (SystemCoreClock / 1000000); // Zeit seit dem letzten Millisekunden-Überlauf hinzufügen
-//    return micros;
-//}
 
 uint32_t dummyCpp;
-
+Stm32ItmLogger::Stm32ItmLogger logger;

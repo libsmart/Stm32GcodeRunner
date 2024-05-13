@@ -13,13 +13,14 @@
 
 #include "globals.h"
 #include <cstdint>
+#include "Stm32ItmLogger.hpp"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-//    uint32_t micros();
-    extern uint32_t dummyCpp;
+extern uint32_t dummyCpp;
+extern Stm32ItmLogger::Stm32ItmLogger logger;
 
 #ifdef __cplusplus
 }

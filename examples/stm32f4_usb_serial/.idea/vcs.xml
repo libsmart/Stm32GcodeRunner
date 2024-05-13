@@ -4,6 +4,7 @@
     <mapping directory="$PROJECT_DIR$/../.." vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Lib/Stm32Common" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Lib/Stm32ItmLogger" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Lib/Stm32ItmLogger/examples/stm32f1_cpp_logger/Lib/Stm32Common" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Lib/Stm32ThreadxThread" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/Lib/Stm32UsbX" vcs="Git" />
   </component>
