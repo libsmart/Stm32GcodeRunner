@@ -11,6 +11,7 @@
 
 #include "main.hpp"
 #include "globals.hpp"
+#include "RunEvery.hpp"
 
 
 /**
@@ -31,21 +32,25 @@ void setup() {
  * @see mainLoopThread() in AZURE_RTOS/App/app_azure_rtos.c
  */
 void loop() {
-    dummyCpp++;
-    dummyCandCpp++;
+    Serial1.loop();
 
+    static Stm32Common::RunEvery re1(3000);
+    re1.loop([](){
+        Serial1.print("counter = ");
+        Serial1.print(dummyCpp);
+        Serial1.println();
+        Serial1.flush();
+    });
 
-    Serial1.print("counter = ");
-    Serial1.print(dummyCpp);
-    Serial1.println();
-    Serial1.flush();
-
-
-    HAL_GPIO_WritePin(LED1_GRN_GPIO_Port, LED1_GRN_Pin, dummyCpp & 1 ? GPIO_PIN_RESET : GPIO_PIN_SET);
-    HAL_GPIO_WritePin(LED2_ORG_GPIO_Port, LED2_ORG_Pin, dummyCpp & 2 ? GPIO_PIN_RESET : GPIO_PIN_SET);
-    HAL_GPIO_WritePin(LED3_RED_GPIO_Port, LED3_RED_Pin, dummyCpp & 4 ? GPIO_PIN_RESET : GPIO_PIN_SET);
-    HAL_GPIO_WritePin(LED4_BLU_GPIO_Port, LED4_BLU_Pin, dummyCpp & 8 ? GPIO_PIN_RESET : GPIO_PIN_SET);
-    HAL_Delay(500);
+    static Stm32Common::RunEvery re2(300);
+    re2.loop([]() {
+        HAL_GPIO_WritePin(LED1_GRN_GPIO_Port, LED1_GRN_Pin, dummyCpp & 1 ? GPIO_PIN_RESET : GPIO_PIN_SET);
+        HAL_GPIO_WritePin(LED2_ORG_GPIO_Port, LED2_ORG_Pin, dummyCpp & 2 ? GPIO_PIN_RESET : GPIO_PIN_SET);
+        HAL_GPIO_WritePin(LED3_RED_GPIO_Port, LED3_RED_Pin, dummyCpp & 4 ? GPIO_PIN_RESET : GPIO_PIN_SET);
+        HAL_GPIO_WritePin(LED4_BLU_GPIO_Port, LED4_BLU_Pin, dummyCpp & 8 ? GPIO_PIN_RESET : GPIO_PIN_SET);
+        dummyCpp++;
+        dummyCandCpp++;
+    });
 }
 
 
