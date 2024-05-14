@@ -9,10 +9,11 @@
 #include "CommandContext.hpp"
 #include "Worker.hpp"
 #include "main.hpp"
+#include "Loggable.hpp"
 
 namespace Stm32GcodeRunner {
 
-    class AbstractCommand {
+    class AbstractCommand : Stm32ItmLogger::Loggable {
         friend Worker;
         friend CommandContext;
 
@@ -36,31 +37,37 @@ namespace Stm32GcodeRunner {
         };
 
         virtual preFlightCheckReturn preFlightCheck() {
-            Debugger_log(DBG, "%s::preFlightCheck()", getName());
+            log()->print(getName());
+            log()->println("::preFlightCheck()");
             return preFlightCheckReturn::ERROR;
         };
 
         virtual initReturn init() {
-            Debugger_log(DBG, "%s::init()", getName());
+            log()->print(getName());
+            log()->println("::init()");
             return initReturn::ERROR;
         };
 
         virtual runReturn run() {
-            Debugger_log(DBG, "%s::run()", getName());
+            log()->print(getName());
+            log()->println("::run()");
             return runReturn::ERROR;
         };
 
         virtual cleanupReturn cleanup() {
-            Debugger_log(DBG, "%s::cleanup()", getName());
+            log()->print(getName());
+            log()->println("::cleanup()");
             return cleanupReturn::ERROR;
         };
 
         virtual void terminate() {
-            Debugger_log(DBG, "%s::terminate()", getName());
+            log()->print(getName());
+            log()->println("::terminate()");
         };
 
         virtual void recycle() {
-            Debugger_log(DBG, "%s::recycle()", getName());
+            log()->print(getName());
+            log()->println("::recycle()");
             setCommandLine("", 0);
         };
 

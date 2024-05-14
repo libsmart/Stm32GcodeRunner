@@ -140,13 +140,13 @@ void Stm32GcodeRunner::CommandContext::onRunFinished() {
 }
 
 void Stm32GcodeRunner::CommandContext::onCleanupFinished() {
-    Debugger_log(DBG, "Stm32GcodeRunner::CommandContext::onCleanupFinished()");
+    log()->println("Stm32GcodeRunner::CommandContext::onCleanupFinished()");
     cmd->onCleanupFinished();
     onCleanupFinishedFn();
 }
 
 void Stm32GcodeRunner::CommandContext::onCmdEnd() {
-    Debugger_log(DBG, "Stm32GcodeRunner::CommandContext::onCmdEnd()");
+    log()->println("Stm32GcodeRunner::CommandContext::onCmdEnd()");
     if(cmdOutputBuffer.getLength() > 0) onWriteFn();
     cmd->onCmdEnd();
     onCmdEndFn();

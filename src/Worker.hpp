@@ -7,6 +7,7 @@
 #define LIBSMART_STM32GCODERUNNER_WORKER_HPP
 
 #include "tx_api.h"
+#include "Loggable.hpp"
 
 #define COMMAND_CONTEXT_POOL_SIZE 4
 #define COMMAND_CONTEXT_QUEUE_SIZE 4
@@ -15,7 +16,7 @@ namespace Stm32GcodeRunner {
     class CommandContext;
     class AbstractCommand;
 
-    class Worker {
+class Worker : public Stm32ItmLogger::Loggable {
     public:
         struct mem_t;
 

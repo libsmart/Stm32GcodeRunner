@@ -8,9 +8,6 @@
 #include "Helper.hpp"
 #include "CommandContext.hpp"
 #include "Stm32GcodeRunner.hpp"
-#include "Stm32ItmLogger.h"
-
-extern Debugger *DBG;
 
 struct Stm32GcodeRunner::Worker::mem_t {
     Stm32GcodeRunner::CommandContext *cmdCtxPtr[COMMAND_CONTEXT_POOL_SIZE]{};
@@ -18,7 +15,7 @@ struct Stm32GcodeRunner::Worker::mem_t {
 };
 
 VOID Stm32GcodeRunner::Worker::workerThread() {
-    Debugger_log(DBG, "Worker::workerThread() starting");
+    log()->println("Worker::workerThread() starting");
 
     UINT ret{};
     CommandContext *cmdCtx{};
@@ -33,11 +30,11 @@ VOID Stm32GcodeRunner::Worker::workerThread() {
         // Wait for command
         ret = tx_queue_receive(&cmdCtxQueue, &cmdCtx, TX_WAIT_FOREVER);
         if (ret != TX_SUCCESS || cmdCtx == nullptr) {
-            Debugger_log(DBG, "%lu: tx_queue_receive() = 0x%02x", millis(), ret);
+            log()->printf("%lu: tx_queue_receive() = 0x%02x\r\n", millis(), ret);
             continue;
         }
 
-        Debugger_log(DBG, "Worker::workerThread() received command %s", cmdCtx->getName());
+        log()->printf("Worker::workerThread() received command %s\r\n", cmdCtx->getName());
 
         currentCmdCtx = cmdCtx;
         cmdCtx->do_run();
@@ -65,7 +62,7 @@ VOID Stm32GcodeRunner::Worker::workerThread() {
 }
 
 Stm32GcodeRunner::Worker::enqueueCommandReturn Stm32GcodeRunner::Worker::enqueueCommandContext(CommandContext *cmdCtx) {
-    Debugger_log(DBG, "Worker::enqueueCommandContext(%s)", cmdCtx->getName());
+    log()->printf("Worker::enqueueCommandContext(%s)\r\n", cmdCtx->getName());
 
     cmdCtx->do_preFlightCheck();
     cmdCtx->do_init();
@@ -79,14 +76,14 @@ Stm32GcodeRunner::Worker::enqueueCommandReturn Stm32GcodeRunner::Worker::enqueue
     // Add the pointer to the command context to the worker queue
     auto ret = tx_queue_send(&cmdCtxQueue, &cmdCtx, TX_NO_WAIT);
     if (ret != TX_SUCCESS) {
-        Debugger_log(DBG, "%lu: tx_queue_send() = 0x%02x", millis(), ret);
+        log()->printf("%lu: tx_queue_send() = 0x%02x\r\n", millis(), ret);
         return enqueueCommandReturn::ERROR;
     }
     return enqueueCommandReturn::OK_ASYNC;
 }
 
 void Stm32GcodeRunner::Worker::clearCommandContextQueue() {
-    Debugger_log(DBG, "Worker::clearCommandContextQueue()");
+    log()->printf("Worker::clearCommandContextQueue()\r\n");
 
     UINT ret{};
     CommandContext *cmdCtx{};
@@ -102,16 +99,16 @@ void Stm32GcodeRunner::Worker::clearCommandContextQueue() {
                           reinterpret_cast<TX_QUEUE **>(TX_NULL)
         );
 
-        Debugger_log(DBG, "enqueued=%d  |  available_storage=%d  |  suspended_count=%d", enqueued, available_storage,
-                     suspended_count);
+        log()->printf("enqueued=%d  |  available_storage=%d  |  suspended_count=%d\r\n", enqueued, available_storage,
+                      suspended_count);
 
         if (enqueued > 0) {
             if (suspended_count != 0) {
-                Debugger_log(DBG, "ERROR: Worker thread is still waiting for command.");
+                log()->printf("ERROR: Worker thread is still waiting for command.\r\n");
             }
             ret = tx_queue_receive(&cmdCtxQueue, &cmdCtx, TX_NO_WAIT);
             if (ret != TX_SUCCESS || cmdCtx == nullptr) {
-                Debugger_log(DBG, "%lu: tx_queue_receive() = 0x%02x", millis(), ret);
+                log()->printf("%lu: tx_queue_receive() = 0x%02x\r\n", millis(), ret);
                 continue;
             }
 

@@ -9,7 +9,7 @@
 
 #define LOG_LETTER_PARAM(letter) \
      if(pVal_##letter != nullptr) \
-     log()->printf(#letter": f=%f  l=%ld", strtod(pVal_##letter, nullptr), strtol(pVal_##letter, nullptr, 10));
+     log()->printf(#letter": f=%f  l=%ld\r\n", strtod(pVal_##letter, nullptr), strtol(pVal_##letter, nullptr, 10));
 
 #define SET_LETTER_PARAM(letter) \
      if(pVal_##letter != nullptr) \

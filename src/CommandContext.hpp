@@ -9,13 +9,12 @@
 #include <functional>
 #include "StringBuffer.hpp"
 #include "Worker.hpp"
-
-#define OUTPUT_BUFFER_SIZE 192
+#include "Loggable.hpp"
 
 namespace Stm32GcodeRunner {
     class AbstractCommand;
 
-    class CommandContext {
+class CommandContext : public Stm32ItmLogger::Loggable {
         //        friend Parser;
         friend Worker;
         friend AbstractCommand;
