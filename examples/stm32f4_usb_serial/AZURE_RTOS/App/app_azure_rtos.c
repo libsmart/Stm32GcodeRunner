@@ -25,7 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <libsmart_config.hpp>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,11 +45,13 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN TX_Pool_Buffer */
+CCMRAM
 /* USER CODE END TX_Pool_Buffer */
 static UCHAR tx_byte_pool_buffer[TX_APP_MEM_POOL_SIZE];
 static TX_BYTE_POOL tx_app_byte_pool;
 
 /* USER CODE BEGIN UX_Device_Pool_Buffer */
+CCMRAM
 /* USER CODE END UX_Device_Pool_Buffer */
 static UCHAR  ux_device_byte_pool_buffer[UX_DEVICE_APP_MEM_POOL_SIZE];
 static TX_BYTE_POOL ux_device_app_byte_pool;

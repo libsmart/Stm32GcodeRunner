@@ -48,11 +48,11 @@ else ()
     add_compile_options(-Og -g)
 endif ()
 
-include_directories(${includes} Application ../../src Lib/Stm32Common/src Lib/Stm32ItmLogger/src Lib/Stm32ThreadxThread/src Lib/Stm32UsbX/src)
+include_directories(${includes} Application ../../src Lib/Stm32Common/src Lib/Stm32ItmLogger/src Lib/Stm32ThreadxThread/src Lib/Stm32UsbX/src Lib/Stm32Serial/src)
 
 add_definitions(${defines})
 
-file(GLOB_RECURSE SOURCES ${sources} "Application/*.*" "../../src/*.*" "Lib/Stm32Common/src/*.*" "Lib/Stm32ItmLogger/src/*.*" "Lib/Stm32ThreadxThread/src/*.*" "Lib/Stm32UsbX/src/*.*")
+file(GLOB_RECURSE SOURCES ${sources} "Application/*.*" "../../src/*.*" "Lib/Stm32Common/src/*.*" "Lib/Stm32ItmLogger/src/*.*" "Lib/Stm32ThreadxThread/src/*.*" "Lib/Stm32UsbX/src/*.*" "Lib/Stm32Serial/src/*.*")
 
 set(LINKER_SCRIPT $${CMAKE_SOURCE_DIR}/${linkerScript})
 

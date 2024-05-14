@@ -24,6 +24,7 @@
 #include "rng.h"
 #include "rtc.h"
 #include "spi.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -99,6 +100,7 @@ int main(void)
   MX_ADC1_Init();
   MX_CRC_Init();
   MX_RNG_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
   // Jump to our C++ setup function

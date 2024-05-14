@@ -21,7 +21,7 @@
 void setup() {
     dummyCpp = 0;
     dummyCandCpp = 0;
-    //Serial.begin();
+    Serial1.begin();
 }
 
 
@@ -35,16 +35,16 @@ void loop() {
     dummyCandCpp++;
 
 
-    //Serial.print("counter = ");
-    //Serial.print(dummyCpp);
-    //Serial.println();
-    //Serial.flush();
+    Serial1.print("counter = ");
+    Serial1.print(dummyCpp);
+    Serial1.println();
+    Serial1.flush();
 
 
-    HAL_GPIO_WritePin(LED1_GRN_GPIO_Port, LED1_GRN_Pin, dummyCpp & 2 ? GPIO_PIN_RESET : GPIO_PIN_SET);
-    HAL_GPIO_WritePin(LED2_ORG_GPIO_Port, LED2_ORG_Pin, dummyCpp & 4 ? GPIO_PIN_RESET : GPIO_PIN_SET);
-    HAL_GPIO_WritePin(LED3_RED_GPIO_Port, LED3_RED_Pin, dummyCpp & 8 ? GPIO_PIN_RESET : GPIO_PIN_SET);
-    HAL_GPIO_WritePin(LED4_BLU_GPIO_Port, LED4_BLU_Pin, dummyCpp & 1 ? GPIO_PIN_RESET : GPIO_PIN_SET);
+    HAL_GPIO_WritePin(LED1_GRN_GPIO_Port, LED1_GRN_Pin, dummyCpp & 1 ? GPIO_PIN_RESET : GPIO_PIN_SET);
+    HAL_GPIO_WritePin(LED2_ORG_GPIO_Port, LED2_ORG_Pin, dummyCpp & 2 ? GPIO_PIN_RESET : GPIO_PIN_SET);
+    HAL_GPIO_WritePin(LED3_RED_GPIO_Port, LED3_RED_Pin, dummyCpp & 4 ? GPIO_PIN_RESET : GPIO_PIN_SET);
+    HAL_GPIO_WritePin(LED4_BLU_GPIO_Port, LED4_BLU_Pin, dummyCpp & 8 ? GPIO_PIN_RESET : GPIO_PIN_SET);
     HAL_Delay(500);
 }
 

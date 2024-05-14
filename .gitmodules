@@ -16,3 +16,6 @@
 [submodule "examples/stm32f4_usb_serial/Lib/Stm32UsbX"]
 	path = examples/stm32f4_usb_serial/Lib/Stm32UsbX
 	url = https://github.com/libsmart/Stm32UsbX.git
+[submodule "examples/stm32f4_usb_serial/Lib/Stm32Serial"]
+	path = examples/stm32f4_usb_serial/Lib/Stm32Serial
+	url = https://github.com/libsmart/Stm32Serial.git

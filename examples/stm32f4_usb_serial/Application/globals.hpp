@@ -14,6 +14,7 @@
 #include "globals.h"
 #include <cstdint>
 #include "Stm32ItmLogger.hpp"
+#include "Stm32Serial.hpp"
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,6 +22,7 @@ extern "C" {
 
 extern uint32_t dummyCpp;
 extern Stm32ItmLogger::Stm32ItmLogger logger;
+extern Stm32Serial::Stm32Serial Serial1;
 
 #ifdef __cplusplus
 }
