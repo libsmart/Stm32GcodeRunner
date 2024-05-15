@@ -15,7 +15,7 @@ Stm32GcodeRunner::WorkerDynamic *Stm32GcodeRunner::worker = {};
 
 UINT Stm32GcodeRunner::setupThread(TX_BYTE_POOL *byte_pool) {
     Stm32ItmLogger::logger.setSeverity(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
-        ->println("WARNING: Stm32GcodeRunner::setupThread()");
+        ->println("Stm32GcodeRunner::setupThread()");
 
     UINT ret = TX_SUCCESS;
     UCHAR *memPtr = nullptr;
