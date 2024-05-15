@@ -10,12 +10,14 @@
 #include "Stm32GcodeRunner.hpp"
 
 struct Stm32GcodeRunner::Worker::mem_t {
-    Stm32GcodeRunner::CommandContext *cmdCtxPtr[COMMAND_CONTEXT_POOL_SIZE]{};
-    Stm32GcodeRunner::CommandContext cmdCtxMem[COMMAND_CONTEXT_POOL_SIZE];
+    CommandContext *cmdCtxPtr[COMMAND_CONTEXT_POOL_SIZE]{};
+    CommandContext cmdCtxMem[COMMAND_CONTEXT_POOL_SIZE];
 };
 
 VOID Stm32GcodeRunner::Worker::workerThread() {
-    log()->println("Worker::workerThread() starting");
+    log()
+            ->setSeverity(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
+            ->println("Stm32GcodeRunner::Worker::workerThread() starting");
 
     UINT ret{};
     CommandContext *cmdCtx{};
@@ -30,11 +32,13 @@ VOID Stm32GcodeRunner::Worker::workerThread() {
         // Wait for command
         ret = tx_queue_receive(&cmdCtxQueue, &cmdCtx, TX_WAIT_FOREVER);
         if (ret != TX_SUCCESS || cmdCtx == nullptr) {
-            log()->printf("%lu: tx_queue_receive() = 0x%02x\r\n", millis(), ret);
+            log(Stm32ItmLogger::LoggerInterface::Severity::ERROR)
+                    ->printf("%lu: tx_queue_receive() = 0x%02x\r\n", millis(), ret);
             continue;
         }
 
-        log()->printf("Worker::workerThread() received command %s\r\n", cmdCtx->getName());
+        log(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)->printf(
+            "Stm32GcodeRunner::Worker::workerThread() received command %s\r\n", cmdCtx->getName());
 
         currentCmdCtx = cmdCtx;
         cmdCtx->do_run();
@@ -62,7 +66,8 @@ VOID Stm32GcodeRunner::Worker::workerThread() {
 }
 
 Stm32GcodeRunner::Worker::enqueueCommandReturn Stm32GcodeRunner::Worker::enqueueCommandContext(CommandContext *cmdCtx) {
-    log()->printf("Worker::enqueueCommandContext(%s)\r\n", cmdCtx->getName());
+    log(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
+            ->printf("Stm32GcodeRunner::Worker::enqueueCommandContext(%s)\r\n", cmdCtx->getName());
 
     cmdCtx->do_preFlightCheck();
     cmdCtx->do_init();
@@ -76,14 +81,16 @@ Stm32GcodeRunner::Worker::enqueueCommandReturn Stm32GcodeRunner::Worker::enqueue
     // Add the pointer to the command context to the worker queue
     auto ret = tx_queue_send(&cmdCtxQueue, &cmdCtx, TX_NO_WAIT);
     if (ret != TX_SUCCESS) {
-        log()->printf("%lu: tx_queue_send() = 0x%02x\r\n", millis(), ret);
+        log(Stm32ItmLogger::LoggerInterface::Severity::ERROR)
+                ->printf("%lu: tx_queue_send() = 0x%02x\r\n", millis(), ret);
         return enqueueCommandReturn::ERROR;
     }
     return enqueueCommandReturn::OK_ASYNC;
 }
 
 void Stm32GcodeRunner::Worker::clearCommandContextQueue() {
-    log()->printf("Worker::clearCommandContextQueue()\r\n");
+    log(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
+            ->printf("Stm32GcodeRunner::Worker::clearCommandContextQueue()\r\n");
 
     UINT ret{};
     CommandContext *cmdCtx{};
@@ -99,16 +106,19 @@ void Stm32GcodeRunner::Worker::clearCommandContextQueue() {
                           reinterpret_cast<TX_QUEUE **>(TX_NULL)
         );
 
-        log()->printf("enqueued=%d  |  available_storage=%d  |  suspended_count=%d\r\n", enqueued, available_storage,
-                      suspended_count);
+        log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)
+                ->printf("enqueued=%d  |  available_storage=%d  |  suspended_count=%d\r\n", enqueued, available_storage,
+                         suspended_count);
 
         if (enqueued > 0) {
             if (suspended_count != 0) {
-                log()->printf("ERROR: Worker thread is still waiting for command.\r\n");
+                log(Stm32ItmLogger::LoggerInterface::Severity::ERROR)
+                        ->printf("ERROR: Worker thread is still waiting for command.\r\n");
             }
             ret = tx_queue_receive(&cmdCtxQueue, &cmdCtx, TX_NO_WAIT);
             if (ret != TX_SUCCESS || cmdCtx == nullptr) {
-                log()->printf("%lu: tx_queue_receive() = 0x%02x\r\n", millis(), ret);
+                log(Stm32ItmLogger::LoggerInterface::Severity::ERROR)
+                        ->printf("%lu: tx_queue_receive() = 0x%02x\r\n", millis(), ret);
                 continue;
             }
 

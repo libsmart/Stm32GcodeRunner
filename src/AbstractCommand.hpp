@@ -12,8 +12,7 @@
 #include "Loggable.hpp"
 
 namespace Stm32GcodeRunner {
-
-    class AbstractCommand : Stm32ItmLogger::Loggable {
+    class AbstractCommand : public Stm32ItmLogger::Loggable {
         friend Worker;
         friend CommandContext;
 
@@ -37,37 +36,49 @@ namespace Stm32GcodeRunner {
         };
 
         virtual preFlightCheckReturn preFlightCheck() {
-            log()->print(getName());
-            log()->println("::preFlightCheck()");
+            log(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
+                    ->print(getName());
+            log(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
+                    ->println("::preFlightCheck()");
             return preFlightCheckReturn::ERROR;
         };
 
         virtual initReturn init() {
-            log()->print(getName());
-            log()->println("::init()");
+            log(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
+                    ->print(getName());
+            log(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
+                    ->println("::init()");
             return initReturn::ERROR;
         };
 
         virtual runReturn run() {
-            log()->print(getName());
-            log()->println("::run()");
+            log(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
+                    ->print(getName());
+            log(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
+                    ->println("::run()");
             return runReturn::ERROR;
         };
 
         virtual cleanupReturn cleanup() {
-            log()->print(getName());
-            log()->println("::cleanup()");
+            log(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
+                    ->print(getName());
+            log(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
+                    ->println("::cleanup()");
             return cleanupReturn::ERROR;
         };
 
         virtual void terminate() {
-            log()->print(getName());
-            log()->println("::terminate()");
+            log(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
+                    ->print(getName());
+            log(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
+                    ->println("::terminate()");
         };
 
         virtual void recycle() {
-            log()->print(getName());
-            log()->println("::recycle()");
+            log(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
+                    ->print(getName());
+            log(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
+                    ->println("::recycle()");
             setCommandLine("", 0);
         };
 

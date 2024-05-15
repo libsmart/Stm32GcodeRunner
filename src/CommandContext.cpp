@@ -14,7 +14,7 @@ AbstractCommand::runReturn runResult = AbstractCommand::runReturn::UNDEF;
 AbstractCommand::cleanupReturn cleanupResult = AbstractCommand::cleanupReturn::UNDEF;
 
 
-bool Stm32GcodeRunner::CommandContext::hasError() {
+bool CommandContext::hasError() {
     switch (cmdState) {
         case cmdStates::UNDEF:
         case cmdStates::PREFLIGHTCHECK:
@@ -29,12 +29,14 @@ bool Stm32GcodeRunner::CommandContext::hasError() {
         case cmdStates::INIT_ERROR:
         case cmdStates::RUN_TIMEOUT:
         case cmdStates::RUN_ERROR:
+        case cmdStates::TERMINATED:
             void(0);
+            break;
     }
     return true;
 }
 
-void Stm32GcodeRunner::CommandContext::do_preFlightCheck() {
+void CommandContext::do_preFlightCheck() {
     if (hasError() || mustRecycle) return;
     if (cmdState != cmdStates::UNDEF) return;
     cmdState = cmdStates::PREFLIGHTCHECK;
@@ -49,7 +51,7 @@ void Stm32GcodeRunner::CommandContext::do_preFlightCheck() {
     }
 }
 
-void Stm32GcodeRunner::CommandContext::do_init() {
+void CommandContext::do_init() {
     if (hasError() || mustRecycle) return;
     if (cmdState != cmdStates::PREFLIGHTCHECK_DONE) return;
     cmdState = cmdStates::INIT;
@@ -58,12 +60,12 @@ void Stm32GcodeRunner::CommandContext::do_init() {
                    ? cmdStates::INIT_DONE
                    : cmdStates::INIT_ERROR;
     if (hasError()) {
-        cmdOutputBuffer.write("ERROR: init failed\r\n");
+        cmdOutputBuffer.println("ERROR: init failed");
         mustRecycle = true;
     }
 }
 
-void Stm32GcodeRunner::CommandContext::do_run() {
+void CommandContext::do_run() {
     if (hasError() || mustRecycle) return;
     if (cmdState != cmdStates::INIT_DONE && cmdState != cmdStates::RUN) return;
     if (cmdState != cmdStates::RUN) {
@@ -102,10 +104,10 @@ void Stm32GcodeRunner::CommandContext::do_run() {
     cmd->runDuration = cmd->getRunDuration();
     if (hasError()) this->onRunError();
     if (cmdState != cmdStates::RUN) this->onRunFinished();
-    if (hasError()) cmdOutputBuffer.write("ERROR: run failed\r\n");
+    if (hasError()) cmdOutputBuffer.println("ERROR: run failed");
 }
 
-void Stm32GcodeRunner::CommandContext::do_cleanup() {
+void CommandContext::do_cleanup() {
     if (mustRecycle) return this->onCmdEnd();
     if (cmdState != cmdStates::RUN_DONE &&
         cmdState != cmdStates::RUN_TIMEOUT &&
@@ -113,50 +115,55 @@ void Stm32GcodeRunner::CommandContext::do_cleanup() {
         return this->onCmdEnd();
     cleanupResult = cmd->cleanup();
     // cmdOutputBuffer.write("ERROR: cleanup failed\r\n");
-    if (!hasError()) cmdOutputBuffer.write("OK\r\n");
+    if (!hasError()) cmdOutputBuffer.println("OK");
     mustRecycle = true;
     this->onCleanupFinished();
     this->onCmdEnd();
 }
 
-void Stm32GcodeRunner::CommandContext::do_terminate() {
+void CommandContext::do_terminate() {
     cmd->terminate();
     mustRecycle = true;
     cmdState = cmdStates::TERMINATED;
-    cmdOutputBuffer.printf("NOTICE: command `%s` terminated\r\nOK\r\n", getCommandLine());
+    cmdOutputBuffer.print("NOTICE: command `");
+    cmdOutputBuffer.print(getCommandLine());
+    cmdOutputBuffer.println("` terminated");
+    cmdOutputBuffer.println("OK");
 }
 
-void Stm32GcodeRunner::CommandContext::onRunTimeout() {
+void CommandContext::onRunTimeout() {
     cmd->onRunTimeout();
 }
 
-void Stm32GcodeRunner::CommandContext::onRunError() {
+void CommandContext::onRunError() {
     cmd->onRunError();
 }
 
-void Stm32GcodeRunner::CommandContext::onRunFinished() {
+void CommandContext::onRunFinished() {
     cmd->onRunFinished();
     onRunFinishedFn();
 }
 
-void Stm32GcodeRunner::CommandContext::onCleanupFinished() {
-    log()->println("Stm32GcodeRunner::CommandContext::onCleanupFinished()");
+void CommandContext::onCleanupFinished() {
+    log(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
+            ->println("Stm32GcodeRunner::CommandContext::onCleanupFinished()");
     cmd->onCleanupFinished();
     onCleanupFinishedFn();
 }
 
-void Stm32GcodeRunner::CommandContext::onCmdEnd() {
-    log()->println("Stm32GcodeRunner::CommandContext::onCmdEnd()");
-    if(cmdOutputBuffer.getLength() > 0) onWriteFn();
+void CommandContext::onCmdEnd() {
+    log(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
+            ->println("Stm32GcodeRunner::CommandContext::onCmdEnd()");
+    if (cmdOutputBuffer.getLength() > 0) onWriteFn();
     cmd->onCmdEnd();
     onCmdEndFn();
 }
 
-bool Stm32GcodeRunner::CommandContext::isCmdSync() {
+bool CommandContext::isCmdSync() {
     return cmd->isSync;
 }
 
-void Stm32GcodeRunner::CommandContext::recycle() {
+void CommandContext::recycle() {
     cmd->recycle();
     cmd = nullptr;
     cmdState = cmdStates::UNDEF;
@@ -170,20 +177,20 @@ void Stm32GcodeRunner::CommandContext::recycle() {
     mustRecycle = false;
 }
 
-bool Stm32GcodeRunner::CommandContext::isFinished() const {
+bool CommandContext::isFinished() const {
     return mustRecycle;
 }
 
-const char *Stm32GcodeRunner::CommandContext::getName() {
+const char *CommandContext::getName() {
     return cmd == nullptr ? nullptr : cmd->getName();
 }
 
-const char *Stm32GcodeRunner::CommandContext::getCommandLine() {
+const char *CommandContext::getCommandLine() {
     return cmd == nullptr ? nullptr : cmd->getCommandLine();
 }
 
 
-bool Stm32GcodeRunner::CommandContext::setCommand(Stm32GcodeRunner::AbstractCommand *command) {
+bool CommandContext::setCommand(AbstractCommand *command) {
     if (cmd == nullptr) {
         cmd = command;
         cmd->setContext(this);

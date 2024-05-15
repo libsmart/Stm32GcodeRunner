@@ -9,7 +9,8 @@
 
 #define LOG_LETTER_PARAM(letter) \
      if(pVal_##letter != nullptr) \
-     log()->printf(#letter": f=%f  l=%ld\r\n", strtod(pVal_##letter, nullptr), strtol(pVal_##letter, nullptr, 10));
+     log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING) \
+        ->printf(#letter": f=%f  l=%ld\r\n", strtod(pVal_##letter, nullptr), strtol(pVal_##letter, nullptr, 10));
 
 #define SET_LETTER_PARAM(letter) \
      if(pVal_##letter != nullptr) \
@@ -24,7 +25,8 @@ inline void char_to_uppercase(char &c) {
 using namespace Stm32GcodeRunner;
 
 Parser::parserReturn Parser::parseString(AbstractCommand * &cmd, const char *inputString, uint32_t strlen) {
-    log()->printf("Stm32GcodeRunner::Parser::parseString('%.*s')\r\n", strlen, inputString);
+    log(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
+            ->printf("Stm32GcodeRunner::Parser::parseString('%.*s')\r\n", strlen, inputString);
 
     if (strlen == 0) return parserReturn::WHITESPACE_STRING;
 
@@ -140,8 +142,8 @@ Parser::parserReturn Parser::parseString(AbstractCommand * &cmd, const char *inp
     if (command_letter == '?') return parserReturn::GARBAGE_STRING;
     if (command_number < 0) return parserReturn::GARBAGE_STRING;
 
-
-    log()->printf("Parsed possible command: %c%d\r\n", command_letter, command_number);
+    log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)->printf("Parsed possible command: %c%d\r\n",
+                                                                      command_letter, command_number);
 
     LOG_LETTER_PARAM(S);
     LOG_LETTER_PARAM(F);
@@ -164,6 +166,10 @@ Parser::parserReturn Parser::parseString(AbstractCommand * &cmd, const char *inp
     if (tmpCmd == nullptr) return parserReturn::UNKNOWN_COMMAND;
     cmd = tmpCmd;
 
+    // Command inherits logger from the parser
+    cmd->setLogger(getLogger());
+    cmd->setCommandLine(inputString, strlen);
+
     SET_LETTER_PARAM(S);
     SET_LETTER_PARAM(F);
     SET_LETTER_PARAM(X);
@@ -175,9 +181,6 @@ Parser::parserReturn Parser::parseString(AbstractCommand * &cmd, const char *inp
     SET_LETTER_PARAM(R);
     SET_LETTER_PARAM(P);
     SET_LETTER_PARAM(D);
-
-
-    cmd->setCommandLine(inputString, strlen);
 
     return parserReturn::OK;
 
@@ -200,7 +203,8 @@ Parser::parserReturn Parser::parseString(AbstractCommand * &cmd, const char *inp
 Parser::cmdRegistryType Parser::cmdRegistry = {};
 
 Parser::registerCommandReturn Parser::registerCommand(AbstractCommand *cmd) {
-    log()->printf("Stm32GcodeRunner::Parser::registerCommand(%s *cmd)\r\n", cmd->getName());
+    log(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
+            ->printf("Stm32GcodeRunner::Parser::registerCommand(%s *cmd)\r\n", cmd->getName());
 
     // Check, if command is already registered
     for (const auto &item: cmdRegistry) {
