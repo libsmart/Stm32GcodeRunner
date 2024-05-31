@@ -6,30 +6,31 @@
 #ifndef LIBSMART_STM32GCODERUNNER_WORKERDYNAMIC_HPP
 #define LIBSMART_STM32GCODERUNNER_WORKERDYNAMIC_HPP
 
+#include "Stm32ThreadX.hpp"
+#include "Thread.hpp"
 #include "Worker.hpp"
-#include "Stm32ThreadxThread.hpp"
 
 namespace Stm32GcodeRunner {
-    class WorkerDynamic : public Worker, public Stm32ThreadxThread::thread {
+    class WorkerDynamic : public Worker, public Stm32ThreadX::Thread {
     public:
         WorkerDynamic(void *pstack,
                       uint32_t stackSize,
-                      const Stm32ThreadxThread::thread::priority &prio,
-                      const char *name) : thread(pstack,
+                      const Stm32ThreadX::Thread::priority &prio,
+                      const char *name) : Thread(pstack,
                                                  stackSize,
-                                                 &Stm32ThreadxThread::BOUNCE(WorkerDynamic, workerThread),
+                                                 &Stm32ThreadX::bounce<WorkerDynamic, decltype(&WorkerDynamic::workerThread), &WorkerDynamic::workerThread>,
                                                  reinterpret_cast<ULONG>(this),
                                                  prio,
                                                  name) {
         }
 
-        WorkerDynamic(threadEntry func, Stm32ThreadxThread::native::ULONG param, const priority &prio, const char *name)
-            : thread(func, param, prio, name) {
+        WorkerDynamic(threadEntry func, Stm32ThreadX::native::ULONG param, const priority &prio, const char *name)
+            : Thread(func, param, prio, name) {
         }
 
-        explicit WorkerDynamic(const char *name) : WorkerDynamic(&Stm32ThreadxThread::BOUNCE(WorkerDynamic, workerThread),
+        explicit WorkerDynamic(const char *name) : WorkerDynamic(&Stm32ThreadX::BOUNCE(WorkerDynamic, workerThread),
                                                         reinterpret_cast<ULONG>(this),
-                                                        Stm32ThreadxThread::thread::priority(),
+                                                        Stm32ThreadX::Thread::priority(),
                                                         name) {
         }
     };
