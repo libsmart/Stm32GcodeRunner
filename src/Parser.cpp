@@ -33,6 +33,9 @@ Parser::parserReturn Parser::parseString(AbstractCommand * &cmd, const char *inp
     bool nonWhiteSpace = false;
     char command_letter = '?';
     int command_number = -1;
+    __attribute__((unused)) const char *pVal_A = nullptr;
+    __attribute__((unused)) const char *pVal_B = nullptr;
+    __attribute__((unused)) const char *pVal_C = nullptr;
     __attribute__((unused)) const char *pVal_S = nullptr;
     __attribute__((unused)) const char *pVal_F = nullptr;
     __attribute__((unused)) const char *pVal_X = nullptr;
@@ -57,6 +60,7 @@ Parser::parserReturn Parser::parseString(AbstractCommand * &cmd, const char *inp
                 // Skip whitespace
                 break;
 
+            case 'E':
             case 'G':
             case 'T':
             case 'M': {
@@ -79,6 +83,18 @@ Parser::parserReturn Parser::parseString(AbstractCommand * &cmd, const char *inp
                     c = inputString[index];
                     char_to_uppercase(c);
                     switch (c) {
+                        case 'A':
+                            pVal_A = inputString + ++index;
+                        break;
+
+                        case 'B':
+                            pVal_B = inputString + ++index;
+                        break;
+
+                        case 'C':
+                            pVal_C = inputString + ++index;
+                        break;
+
                         case 'S':
                             pVal_S = inputString + ++index;
                             break;
@@ -145,6 +161,9 @@ Parser::parserReturn Parser::parseString(AbstractCommand * &cmd, const char *inp
     log(Stm32ItmLogger::LoggerInterface::Severity::DEBUGGING)->printf("Parsed possible command: %c%d\r\n",
                                                                       command_letter, command_number);
 
+    LOG_LETTER_PARAM(A);
+    LOG_LETTER_PARAM(B);
+    LOG_LETTER_PARAM(C);
     LOG_LETTER_PARAM(S);
     LOG_LETTER_PARAM(F);
     LOG_LETTER_PARAM(X);
@@ -170,6 +189,9 @@ Parser::parserReturn Parser::parseString(AbstractCommand * &cmd, const char *inp
     cmd->setLogger(getLogger());
     cmd->setCommandLine(inputString, strlen);
 
+    SET_LETTER_PARAM(A);
+    SET_LETTER_PARAM(B);
+    SET_LETTER_PARAM(C);
     SET_LETTER_PARAM(S);
     SET_LETTER_PARAM(F);
     SET_LETTER_PARAM(X);
