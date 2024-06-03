@@ -92,7 +92,8 @@ Parser::parserReturn Parser::parseString(AbstractCommand * &cmd, const char *inp
                         break;
 
                         case 'C':
-                            pVal_C = inputString + ++index;
+                            index++;
+                            pVal_C = pVal_C != nullptr ? pVal_C : (inputString + index);
                         break;
 
                         case 'S':
