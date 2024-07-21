@@ -124,7 +124,7 @@ class CommandContext : public Stm32ItmLogger::Loggable {
         AbstractCommand::cleanupReturn cleanupResult = AbstractCommand::cleanupReturn::UNDEF;
         */
 
-        class cmdOutputBufferClass final : public Stm32Common::StringBuffer<192> {
+        class cmdOutputBufferClass final : public Stm32Common::StringBuffer<LIBSMART_GCODERUNNER_OUTPUT_BUFFER_SIZE> {
         public:
             cmdOutputBufferClass() = delete;
 
