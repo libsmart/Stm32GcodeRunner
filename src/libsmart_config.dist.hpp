@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#ifndef LIBSMART_STM32GCODERUNNER_LIBSMART_CONFIG_DIST_HPP
+#define LIBSMART_STM32GCODERUNNER_LIBSMART_CONFIG_DIST_HPP
+
+#define LIBSMART_STM32GCODERUNNER
 
 /**
  * Size of the stack for the worker thread.
@@ -21,3 +25,4 @@
 #define LIBSMART_GCODERUNNER_COMMAND_REGISTRY_SIZE 12
 
 
+#endif
