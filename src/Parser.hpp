@@ -47,6 +47,8 @@ namespace Stm32GcodeRunner {
             OK, WHITESPACE_STRING, GARBAGE_STRING, UNKNOWN_COMMAND
         };
 
+        virtual parserReturn parseArgcArgv(AbstractCommand * &cmd, int argc, const char *const *argv);
+
         virtual parserReturn parseString(AbstractCommand *&cmd, const char *inputString, uint32_t strlen);
 
     private:

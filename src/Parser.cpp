@@ -24,6 +24,25 @@ inline void char_to_uppercase(char &c) {
 
 using namespace Stm32GcodeRunner;
 
+Parser::parserReturn Parser::parseArgcArgv(AbstractCommand * &cmd, int argc, const char *const *argv) {
+
+    if(argc < 1) return parserReturn::UNKNOWN_COMMAND;
+
+    AbstractCommand *tmpCmd = findCommand(argv[0]);
+    if (tmpCmd == nullptr) return parserReturn::UNKNOWN_COMMAND;
+    cmd = tmpCmd;
+
+    // Command inherits logger from the parser
+    cmd->setLogger(getLogger());
+    // cmd->setCommandLine(inputString, strlen);
+
+    for(int i = 1; i < argc; i++) {
+        cmd->setParam(argv[i][0], &argv[i][1]);
+    }
+
+    return parserReturn::OK;
+}
+
 Parser::parserReturn Parser::parseString(AbstractCommand * &cmd, const char *inputString, uint32_t strlen) {
     log(Stm32ItmLogger::LoggerInterface::Severity::INFORMATIONAL)
             ->printf("Stm32GcodeRunner::Parser::parseString('%.*s')\r\n", strlen, inputString);
