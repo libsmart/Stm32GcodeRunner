@@ -172,11 +172,25 @@ void Stm32GcodeRunner::Worker::deleteCommandContext(Stm32GcodeRunner::CommandCon
             cmdCtx->~CommandContext();
             // Clear pointer and memory
             mem->cmdCtxPtr[index] = nullptr;
-            memset(&mem->cmdCtxMem[index], 0, sizeof mem->cmdCtxMem[index]);
+            memset(&mem->cmdCtxMem[index], 0, sizeof(mem->cmdCtxMem[index]));
             return;
         }
     }
 }
+
+void Stm32GcodeRunner::Worker::terminateCommandContext(CommandContext *cmdCtx) {
+    if(cmdCtx == nullptr) return;
+
+    if(worker->getRunningCommandContext() == cmdCtx) {
+        worker->terminate();
+    }
+
+    cmdCtx->do_terminate();
+    worker->reset();
+    worker->deleteCommandContext(cmdCtx);
+    worker->resume();
+}
+
 
 bool Stm32GcodeRunner::Worker::hasRunningCommandContext() {
     return currentCmdCtx != nullptr;

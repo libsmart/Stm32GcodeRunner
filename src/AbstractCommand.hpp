@@ -96,7 +96,7 @@ namespace Stm32GcodeRunner {
 
         virtual const char *getCommandLine();
 
-        virtual const char *getName() { return "AbstractCommand"; };
+        virtual const char *getName() { return "AbstractCommand"; }
 
         void setRunTimeout(unsigned long timeout);
 
@@ -106,6 +106,7 @@ namespace Stm32GcodeRunner {
 
         bool isQuietRun() const;
 
+        CommandContext *getCommandContext() { return ctx; }
 
         virtual AbstractCommand *factory() { return new AbstractCommand; };
 

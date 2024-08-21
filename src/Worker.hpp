@@ -41,6 +41,8 @@ class Worker : public Stm32ItmLogger::Loggable {
 
         void deleteCommandContext(CommandContext *cmdCtx);
 
+        static void terminateCommandContext(CommandContext *cmdCtx);
+
         static void terminateCurrent();
 
         static void terminateAll();
