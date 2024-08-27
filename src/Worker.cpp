@@ -201,13 +201,18 @@ Stm32GcodeRunner::CommandContext *Stm32GcodeRunner::Worker::getRunningCommandCon
 }
 
 void Stm32GcodeRunner::Worker::terminateCurrent() {
+    CommandContext *cmdCtx{};
     // Terminate running command
     Stm32GcodeRunner::worker->terminate();
     if (Stm32GcodeRunner::worker->hasRunningCommandContext()) {
-        auto cmdCtx = Stm32GcodeRunner::worker->getRunningCommandContext();
+        cmdCtx = Stm32GcodeRunner::worker->getRunningCommandContext();
         cmdCtx->do_terminate();
     }
     Stm32GcodeRunner::worker->reset();
+
+    if (cmdCtx != nullptr) {
+        worker->deleteCommandContext(cmdCtx);
+    }
 
     // Restart worker thread
     Stm32GcodeRunner::worker->resume();
