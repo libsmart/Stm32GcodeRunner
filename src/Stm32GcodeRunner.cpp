@@ -62,6 +62,7 @@ UINT Stm32GcodeRunner::setupThread(TX_BYTE_POOL *byte_pool) {
 
 
     // Allocate memory for the context pool
+    // @see https://github.com/eclipse-threadx/rtos-docs/blob/main/rtos-docs/threadx/chapter4.md#tx_byte_allocate
     ret = tx_byte_allocate(byte_pool, reinterpret_cast<void **>(&memPtr),
                            Worker::getCommandContextPoolSizeRequirement(), TX_NO_WAIT);
     if (ret != TX_SUCCESS) {
