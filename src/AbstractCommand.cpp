@@ -49,7 +49,7 @@ bool Stm32GcodeRunner::AbstractCommand::write(const char *str) {
 
 bool Stm32GcodeRunner::AbstractCommand::write(const void *in, size_t strlen) {
     if (ctx == nullptr) return false;
-    return ctx->cmdOutputBuffer.write(in, strlen);
+    return ctx->cmdOutputBuffer.write(static_cast<const uint8_t *>(in), strlen);
 }
 
 bool Stm32GcodeRunner::AbstractCommand::printf(const char *format, ...) {
