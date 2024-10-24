@@ -16,7 +16,7 @@ namespace Stm32GcodeRunner {
     class CommandContext;
     class AbstractCommand;
 
-class Worker : public Stm32ItmLogger::Loggable {
+    class Worker : public Stm32ItmLogger::Loggable {
     public:
         struct mem_t;
 
@@ -35,6 +35,8 @@ class Worker : public Stm32ItmLogger::Loggable {
         CommandContext *getRunningCommandContext();
 
         // cmdCtxStorage
+        bool isCommandContextStorageFull();
+
         bool createCommandContext(CommandContext *&cmdCtx);
 
         bool createCommandContext(CommandContext *&cmdCtx, AbstractCommand *cmd);

@@ -200,6 +200,15 @@ Stm32GcodeRunner::CommandContext *Stm32GcodeRunner::Worker::getRunningCommandCon
     return currentCmdCtx;
 }
 
+bool Stm32GcodeRunner::Worker::isCommandContextStorageFull() {
+    for (const auto & index : mem->cmdCtxPtr) {
+        if (index == nullptr) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void Stm32GcodeRunner::Worker::terminateCurrent() {
     CommandContext *cmdCtx{};
     // Terminate running command
